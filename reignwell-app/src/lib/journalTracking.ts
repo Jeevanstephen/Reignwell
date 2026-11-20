@@ -4,12 +4,28 @@ const JOURNAL_KEY = 'rw_journal';
 
 export type Mood = 'great' | 'good' | 'okay' | 'bad' | 'terrible';
 
+export const MOOD_EMOJI: Record<Mood, string> = {
+  great:    '😄',
+  good:     '🙂',
+  okay:     '😐',
+  bad:      '😔',
+  terrible: '😢',
+};
+
+export const MOOD_LABEL: Record<Mood, string> = {
+  great:    'Great',
+  good:     'Good',
+  okay:     'Okay',
+  bad:      'Bad',
+  terrible: 'Terrible',
+};
+
 export interface JournalEntry {
   id: string;
-  text: string;
-  mood: Mood;
-  timestamp: string; // ISO
   date: string;      // YYYY-MM-DD
+  mood: Mood;
+  text: string;
+  createdAt: string; // ISO timestamp
 }
 
 async function readAll(): Promise<JournalEntry[]> {
@@ -21,44 +37,21 @@ async function writeAll(entries: JournalEntry[]): Promise<void> {
   await AsyncStorage.setItem(JOURNAL_KEY, JSON.stringify(entries));
 }
 
-export async function addJournalEntry(text: string, mood: Mood): Promise<JournalEntry> {
-  const now = new Date();
+export async function saveJournalEntry(mood: Mood, text: string): Promise<JournalEntry> {
   const entry: JournalEntry = {
     id: `j_${Date.now()}`,
-    text: text.trim(),
+    date: new Date().toISOString().slice(0, 10),
     mood,
-    timestamp: now.toISOString(),
-    date: now.toISOString().slice(0, 10),
+    text,
+    createdAt: new Date().toISOString(),
   };
   const all = await readAll();
-  await writeAll([entry, ...all]);
+  all.unshift(entry);
+  await writeAll(all);
   return entry;
 }
 
-export async function getJournalEntries(limit = 50): Promise<JournalEntry[]> {
+export async function getJournalEntries(limit = 30): Promise<JournalEntry[]> {
   const all = await readAll();
   return all.slice(0, limit);
-}
-
-export async function getTodayEntry(): Promise<JournalEntry | null> {
-  const today = new Date().toISOString().slice(0, 10);
-  const all = await readAll();
-  return all.find(e => e.date === today) ?? null;
-}
-
-export async function updateJournalEntry(
-  id: string,
-  updates: Partial<Pick<JournalEntry, 'text' | 'mood'>>,
-): Promise<JournalEntry | null> {
-  const all = await readAll();
-  const idx = all.findIndex(e => e.id === id);
-  if (idx === -1) return null;
-  all[idx] = { ...all[idx], ...updates };
-  await writeAll(all);
-  return all[idx];
-}
-
-export async function deleteJournalEntry(id: string): Promise<void> {
-  const all = await readAll();
-  await writeAll(all.filter(e => e.id !== id));
 }
