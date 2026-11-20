@@ -2,7 +2,13 @@
 
 Premium health & nutrition tracking app — landing page + interactive demo.
 
-## Quick start
+## Live app
+
+**https://[your-github-username].github.io/reignwell**
+
+Deploys automatically on every push via GitHub Actions.
+
+## Quick start (local)
 
 Open `web/index.html` in a browser. No build step needed.
 
