@@ -1,7 +1,10 @@
 import React from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
+import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../context/AuthContext';
 import ScoreRing from '../components/ScoreRing';
+import { MainTabParamList } from '../navigation/MainNavigator';
 
 const NUTRIENTS = [
   { name: 'Iron', value: 72, unit: '%', status: 'green' },
@@ -18,6 +21,13 @@ const STATUS_COLORS: Record<string, string> = {
   red: '#EF4444',
 };
 
+const QUICK_ACTIONS = [
+  { icon: '🍽️', label: 'Log Food', tab: 'FoodLog' as const },
+  { icon: '🩸', label: 'Blood', tab: 'BloodWork' as const },
+  { icon: '💊', label: 'Supps', tab: 'Supplements' as const },
+  { icon: '✦', label: 'Coach', tab: 'Coach' as const },
+];
+
 function getGreeting() {
   const h = new Date().getHours();
   if (h < 12) return 'Good morning';
@@ -27,7 +37,8 @@ function getGreeting() {
 
 export default function DashboardScreen() {
   const { user, signOut } = useAuth();
-  const name = user?.user_metadata?.full_name?.split(' ')[0] ?? 'there';
+  const navigation = useNavigation<BottomTabNavigationProp<MainTabParamList>>();
+  const name = (user as any)?.user_metadata?.full_name?.split(' ')[0] ?? 'there';
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -39,6 +50,20 @@ export default function DashboardScreen() {
         <TouchableOpacity style={styles.signOutBtn} onPress={signOut}>
           <Text style={styles.signOutText}>Sign out</Text>
         </TouchableOpacity>
+      </View>
+
+      {/* Quick Actions */}
+      <View style={styles.quickActions}>
+        {QUICK_ACTIONS.map((a) => (
+          <TouchableOpacity
+            key={a.tab}
+            style={styles.quickAction}
+            onPress={() => navigation.navigate(a.tab)}
+          >
+            <Text style={styles.quickActionIcon}>{a.icon}</Text>
+            <Text style={styles.quickActionLabel}>{a.label}</Text>
+          </TouchableOpacity>
+        ))}
       </View>
 
       {/* Daily Score */}
@@ -72,8 +97,8 @@ export default function DashboardScreen() {
         <Text style={styles.priorityText}>
           Your Vitamin D is at 38% — below optimal range. Consider 15 mins of sun exposure or a D3 supplement.
         </Text>
-        <TouchableOpacity style={styles.priorityBtn}>
-          <Text style={styles.priorityBtnText}>Learn more</Text>
+        <TouchableOpacity style={styles.priorityBtn} onPress={() => navigation.navigate('Supplements')}>
+          <Text style={styles.priorityBtnText}>View Supplements</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>
@@ -88,6 +113,16 @@ const styles = StyleSheet.create({
   name: { fontSize: 24, fontWeight: '700', color: '#111111' },
   signOutBtn: { paddingVertical: 6, paddingHorizontal: 12, borderWidth: 1, borderColor: '#E0E0E0', borderRadius: 8 },
   signOutText: { fontSize: 12, color: '#666666' },
+  quickActions: { flexDirection: 'row', gap: 10, marginBottom: 24 },
+  quickAction: {
+    flex: 1,
+    backgroundColor: '#F7F7F7',
+    borderRadius: 14,
+    paddingVertical: 14,
+    alignItems: 'center',
+  },
+  quickActionIcon: { fontSize: 22, marginBottom: 6 },
+  quickActionLabel: { fontSize: 11, fontWeight: '600', color: '#333333' },
   scoreCard: {
     backgroundColor: '#F7F7F7',
     borderRadius: 16,
