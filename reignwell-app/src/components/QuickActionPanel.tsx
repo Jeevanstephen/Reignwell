@@ -69,6 +69,7 @@ export default function QuickActionPanel({ onNavigate }: Props) {
     { icon: '🍴', label: 'Meal Ideas', onPress: () => onNavigate('MealSuggestions') },
     { icon: '💊', label: 'Regimens',  onPress: () => onNavigate('Regimens') },
     { icon: '📖', label: 'Journal',   onPress: () => onNavigate('Journal') },
+    { icon: '🛒', label: 'Shop',      onPress: () => onNavigate('Shop') },
   ];
 
   const spin = rotateAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '45deg'] });
