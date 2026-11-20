@@ -1,21 +1,16 @@
 import React from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, Dimensions } from 'react-native';
-import { LinearGradient } from 'expo-linear-gradient';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
+import CrownLogo from '../components/CrownLogo';
 import { AuthStackParamList } from '../navigation/types';
 
 type Props = { navigation: NativeStackNavigationProp<AuthStackParamList, 'Onboarding'> };
 
-const { width, height } = Dimensions.get('window');
-
 export default function OnboardingScreen({ navigation }: Props) {
   return (
-    <LinearGradient colors={['#111111', '#1a1a1a']} style={styles.container}>
-      <View style={styles.content}>
-        <View style={styles.logoRow}>
-          <Text style={styles.crown}>♛</Text>
-          <Text style={styles.logoText}>REIGNWELL</Text>
-        </View>
+    <View style={styles.container}>
+      <View style={styles.logoSection}>
+        <CrownLogo crownSize={72} fontSize={24} color="#111111" />
         <Text style={styles.tagline}>Your health. Elevated.</Text>
         <Text style={styles.sub}>
           Track nutrition, monitor biomarkers, and unlock your peak performance with AI-powered insights.
@@ -30,48 +25,49 @@ export default function OnboardingScreen({ navigation }: Props) {
           <Text style={styles.secondaryBtnText}>Sign In</Text>
         </TouchableOpacity>
       </View>
-    </LinearGradient>
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1 },
-  content: { flex: 1, justifyContent: 'center', alignItems: 'center', paddingHorizontal: 32 },
-  logoRow: { flexDirection: 'row', alignItems: 'center', marginBottom: 16 },
-  crown: { fontSize: 36, color: '#C9A84C', marginRight: 10 },
-  logoText: {
-    fontSize: 28,
-    color: '#FFFFFF',
-    fontWeight: '700',
-    letterSpacing: 4,
+  container: {
+    flex: 1,
+    backgroundColor: '#FFFFFF',
+    paddingHorizontal: 28,
+    justifyContent: 'space-between',
+    paddingTop: 100,
+    paddingBottom: 52,
   },
+  logoSection: { alignItems: 'center', gap: 20 },
   tagline: {
     fontSize: 20,
     color: '#C9A84C',
-    marginBottom: 16,
-    fontWeight: '500',
-    letterSpacing: 1,
+    fontWeight: '600',
+    letterSpacing: 0.5,
+    marginTop: 8,
   },
   sub: {
     fontSize: 15,
-    color: '#999999',
+    color: '#666666',
     textAlign: 'center',
     lineHeight: 24,
+    marginTop: 4,
   },
-  actions: { paddingHorizontal: 24, paddingBottom: 48, gap: 12 },
+  actions: { gap: 12 },
   primaryBtn: {
     backgroundColor: '#C9A84C',
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderRadius: 14,
+    paddingVertical: 17,
     alignItems: 'center',
   },
   primaryBtnText: { color: '#111111', fontSize: 16, fontWeight: '700' },
   secondaryBtn: {
-    borderWidth: 1,
-    borderColor: '#333333',
-    borderRadius: 12,
-    paddingVertical: 16,
+    borderWidth: 1.5,
+    borderColor: '#DDDDDD',
+    borderRadius: 14,
+    paddingVertical: 17,
     alignItems: 'center',
+    backgroundColor: '#FFFFFF',
   },
-  secondaryBtnText: { color: '#FFFFFF', fontSize: 16, fontWeight: '500' },
+  secondaryBtnText: { color: '#111111', fontSize: 16, fontWeight: '500' },
 });

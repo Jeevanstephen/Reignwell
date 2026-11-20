@@ -1,9 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { StatusBar } from 'expo-status-bar';
 import { AuthProvider, useAuth } from './src/context/AuthContext';
 import AuthNavigator from './src/navigation/AuthNavigator';
 import MainNavigator from './src/navigation/MainNavigator';
+import SplashScreen from './src/screens/SplashScreen';
 import { View, ActivityIndicator } from 'react-native';
 
 function RootNavigator() {
@@ -21,6 +22,17 @@ function RootNavigator() {
 }
 
 export default function App() {
+  const [splashDone, setSplashDone] = useState(false);
+
+  if (!splashDone) {
+    return (
+      <>
+        <StatusBar style="dark" />
+        <SplashScreen onFinish={() => setSplashDone(true)} />
+      </>
+    );
+  }
+
   return (
     <AuthProvider>
       <NavigationContainer>
