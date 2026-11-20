@@ -10,6 +10,7 @@ import {
   analyzeFood, saveAnalysisToLog, getApiKey, saveApiKey,
   AnalysisResult, LoggedMeal as AiMeal,
 } from '../lib/aiCamera';
+import { getDailyCalorieSummary, DaySummary, PORTION_MULTIPLIER, PortionSize } from '../lib/foodLog';
 
 const FOOD_DB = [
   { id: 'f1',  emoji: '🍗', name: 'Grilled Chicken Breast',   kcal: 165, protein: 31, carbs: 0,  fat: 3  },
@@ -77,8 +78,13 @@ function MacroBar({ label, value, goal, color }: { label: string; value: number;
   );
 }
 
+// Portion size state keyed by meal id
+type PortionMap = Record<string, PortionSize>;
+
 export default function FoodLogScreen() {
   const [meals, setMeals] = useState<LoggedMeal[]>([]);
+  const [portions, setPortions] = useState<PortionMap>({});
+  const [daySummary, setDaySummary] = useState<DaySummary | null>(null);
   const [modalVisible, setModalVisible] = useState(false);
   const [search, setSearch] = useState('');
   const [analyzing, setAnalyzing] = useState(false);
@@ -86,6 +92,13 @@ export default function FoodLogScreen() {
   const [apiKeyModalVisible, setApiKeyModalVisible] = useState(false);
   const [apiKeyInput, setApiKeyInput] = useState('');
   const glowAnim = useRef(new Animated.Value(0)).current;
+
+  const refreshSummary = useCallback(async () => {
+    try {
+      const s = await getDailyCalorieSummary();
+      setDaySummary(s);
+    } catch {}
+  }, []);
 
   useEffect(() => {
     Animated.loop(
@@ -95,6 +108,7 @@ export default function FoodLogScreen() {
       ])
     ).start();
     loadMeals();
+    refreshSummary();
   }, []);
 
   const loadMeals = async () => {
@@ -131,9 +145,10 @@ export default function FoodLogScreen() {
     const updated = [...meals, meal];
     setMeals(updated);
     persistMeals(updated);
+    refreshSummary();
     setModalVisible(false);
     setSearch('');
-  }, [meals]);
+  }, [meals, refreshSummary]);
 
   const removeFood = useCallback((id: string) => {
     Alert.alert('Remove?', "Remove this item from today's log?", [
@@ -143,6 +158,7 @@ export default function FoodLogScreen() {
           const updated = meals.filter(m => m.id !== id);
           setMeals(updated);
           persistMeals(updated);
+          refreshSummary();
         },
       },
     ]);
@@ -209,15 +225,34 @@ export default function FoodLogScreen() {
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.heading}>Food Log</Text>
-      <Text style={styles.sub}>Today · {totalKcal} / {GOALS.kcal} kcal</Text>
+      <Text style={styles.sub}>Today</Text>
 
-      {/* Macro Summary */}
-      <View style={styles.macroCard}>
-        <Text style={styles.macroTitle}>Macros</Text>
-        <MacroBar label="Protein" value={totalProtein} goal={GOALS.protein} color="#22C55E" />
-        <MacroBar label="Carbs"   value={totalCarbs}   goal={GOALS.carbs}   color="#3B82F6" />
-        <MacroBar label="Fat"     value={totalFat}     goal={GOALS.fat}     color="#F59E0B" />
-      </View>
+      {/* Calorie Summary Bar */}
+      {daySummary && (
+        <View style={styles.calSummary}>
+          <View style={styles.calSummaryRow}>
+            <Text style={styles.calConsumed}>{daySummary.consumed.toLocaleString()} kcal</Text>
+            <Text style={styles.calTarget}>/ {daySummary.target.toLocaleString()} kcal</Text>
+          </View>
+          <View style={styles.calBar}>
+            <View style={[
+              styles.calBarFill,
+              { width: `${Math.min(daySummary.consumed / daySummary.target, 1) * 100}%` as any },
+              daySummary.consumed > daySummary.target && styles.calBarOver,
+            ]} />
+          </View>
+          <View style={styles.macroInlineRow}>
+            <Text style={styles.macroInline}>P <Text style={styles.macroVal}>{daySummary.protein}g</Text></Text>
+            <Text style={styles.macroDot}>·</Text>
+            <Text style={styles.macroInline}>C <Text style={styles.macroVal}>{daySummary.carbs}g</Text></Text>
+            <Text style={styles.macroDot}>·</Text>
+            <Text style={styles.macroInline}>F <Text style={styles.macroVal}>{daySummary.fat}g</Text></Text>
+            {daySummary.remaining > 0 && (
+              <Text style={styles.remaining}>{daySummary.remaining} remaining</Text>
+            )}
+          </View>
+        </View>
+      )}
 
       {/* AI Camera Button */}
       <Animated.View style={[styles.cameraBtn, { opacity: glowOpacity }]}>
@@ -244,17 +279,31 @@ export default function FoodLogScreen() {
       ) : (
         meals.map((meal) => {
           const links = getLinksForMeal(meal.name);
+          const portion: PortionSize = portions[meal.id] ?? 'M';
+          const mult = PORTION_MULTIPLIER[portion];
+          const displayKcal = Math.round(meal.kcal * mult);
           return (
             <View key={meal.id}>
               <TouchableOpacity style={styles.mealRow} onLongPress={() => removeFood(meal.id)}>
                 <Text style={styles.mealEmoji}>{meal.emoji}</Text>
                 <View style={styles.mealInfo}>
                   <Text style={styles.mealName}>{meal.name}</Text>
-                  <Text style={styles.mealTime}>
-                    {meal.time}{meal.source === 'ai_camera' ? ' · AI' : ''}
-                  </Text>
+                  <View style={styles.portionRow}>
+                    {(['S', 'M', 'L'] as PortionSize[]).map(p => (
+                      <TouchableOpacity
+                        key={p}
+                        style={[styles.portionPill, portion === p && styles.portionPillActive]}
+                        onPress={() => setPortions(prev => ({ ...prev, [meal.id]: p }))}
+                      >
+                        <Text style={[styles.portionPillText, portion === p && styles.portionPillTextActive]}>{p}</Text>
+                      </TouchableOpacity>
+                    ))}
+                    <Text style={styles.mealTime}>
+                      {meal.time}{meal.source === 'ai_camera' ? ' · AI' : ''}
+                    </Text>
+                  </View>
                 </View>
-                <Text style={styles.mealKcal}>{meal.kcal} kcal</Text>
+                <Text style={styles.mealKcal}>{displayKcal} kcal</Text>
               </TouchableOpacity>
               {links.length > 0 && (
                 <View style={styles.affiliateRow}>
@@ -485,6 +534,28 @@ const styles = StyleSheet.create({
     paddingVertical: 14, alignItems: 'center', marginTop: 4,
   },
   addBtnText: { color: '#666666', fontSize: 14, fontWeight: '500' },
+  // Calorie summary
+  calSummary: { backgroundColor: '#F7F7F7', borderRadius: 16, padding: 16, marginBottom: 20 },
+  calSummaryRow: { flexDirection: 'row', alignItems: 'baseline', gap: 4, marginBottom: 8 },
+  calConsumed: { fontSize: 22, fontWeight: '700', color: '#111111' },
+  calTarget: { fontSize: 14, color: '#999999' },
+  calBar: { height: 6, backgroundColor: '#E8E8E8', borderRadius: 3, marginBottom: 10 },
+  calBarFill: { height: 6, backgroundColor: '#C9A84C', borderRadius: 3 },
+  calBarOver: { backgroundColor: '#EF4444' },
+  macroInlineRow: { flexDirection: 'row', alignItems: 'center', gap: 6 },
+  macroInline: { fontSize: 12, color: '#999999' },
+  macroVal: { fontWeight: '700', color: '#333333' },
+  macroDot: { fontSize: 12, color: '#CCCCCC' },
+  remaining: { marginLeft: 'auto' as any, fontSize: 11, color: '#22C55E', fontWeight: '600' },
+  // Portion
+  portionRow: { flexDirection: 'row', alignItems: 'center', gap: 4, marginTop: 4 },
+  portionPill: {
+    paddingHorizontal: 7, paddingVertical: 2, borderRadius: 10,
+    borderWidth: 1, borderColor: '#E0E0E0', backgroundColor: '#F5F5F5',
+  },
+  portionPillActive: { borderColor: '#C9A84C', backgroundColor: '#FBF6EC' },
+  portionPillText: { fontSize: 10, fontWeight: '700', color: '#999999' },
+  portionPillTextActive: { color: '#C9A84C' },
   affiliateRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 4, paddingBottom: 10, marginTop: -4 },
   affiliateChip: {
     backgroundColor: '#FBF6EC', borderRadius: 20, borderWidth: 1,
