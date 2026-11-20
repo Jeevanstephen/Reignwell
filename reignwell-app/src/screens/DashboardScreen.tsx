@@ -26,10 +26,10 @@ const STATUS_COLORS: Record<string, string> = {
 };
 
 const QUICK_ACTIONS = [
-  { icon: '🍽️', label: 'Log Food', tab: 'FoodLog' as const },
-  { icon: '🩸', label: 'Blood', tab: 'BloodWork' as const },
-  { icon: '💊', label: 'Supps', tab: 'Supplements' as const },
-  { icon: '✦', label: 'Coach', tab: 'Coach' as const },
+  { icon: '🍽️', label: 'Log Food',  screen: 'FoodLog'  },
+  { icon: '💊', label: 'Regimens',  screen: 'Regimens' },
+  { icon: '🛒', label: 'Shop',      screen: 'Shop'     },
+  { icon: '📈', label: 'Progress',  screen: 'Progress' },
 ];
 
 function getGreeting() {
@@ -83,9 +83,9 @@ export default function DashboardScreen() {
       <View style={styles.quickActions}>
         {QUICK_ACTIONS.map((a) => (
           <TouchableOpacity
-            key={a.tab}
+            key={a.screen}
             style={styles.quickAction}
-            onPress={() => navigation.navigate(a.tab)}
+            onPress={() => (navigation as any).navigate(a.screen)}
           >
             <Text style={styles.quickActionIcon}>{a.icon}</Text>
             <Text style={styles.quickActionLabel}>{a.label}</Text>

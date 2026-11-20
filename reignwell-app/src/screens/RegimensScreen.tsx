@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, Modal,
 } from 'react-native';
+import { useNavigation } from '@react-navigation/native';
 import { regimens, Regimen } from '../lib/regimens';
 import { getLinksForMeal, openAffiliateLink } from '../lib/amazonLinks';
 
@@ -100,6 +101,7 @@ function RegimenDetail({
 export default function RegimensScreen() {
   const [selected, setSelected] = useState<Regimen | null>(null);
   const [activeId, setActiveId] = useState<string | null>('muscle');
+  const navigation = useNavigation<any>();
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -126,6 +128,15 @@ export default function RegimensScreen() {
           </View>
         </TouchableOpacity>
       ))}
+
+      {/* Shop banner */}
+      <TouchableOpacity style={styles.shopBanner} onPress={() => navigation.navigate('Shop')}>
+        <View style={styles.shopBannerLeft}>
+          <Text style={styles.shopBannerTitle}>🛒 Browse All Supplements</Text>
+          <Text style={styles.shopBannerSub}>20+ products across 5 categories on Amazon</Text>
+        </View>
+        <Text style={styles.shopBannerArrow}>→</Text>
+      </TouchableOpacity>
 
       {selected && (
         <RegimenDetail
@@ -215,4 +226,12 @@ const styles = StyleSheet.create({
   cardFooter: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
   cardPrice: { fontSize: 15, fontWeight: '700', color: '#C9A84C' },
   cardArrow: { fontSize: 13, color: '#999999' },
+  shopBanner: {
+    flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between',
+    backgroundColor: '#111111', borderRadius: 16, padding: 20, marginTop: 8, marginBottom: 8,
+  },
+  shopBannerLeft: { flex: 1 },
+  shopBannerTitle: { fontSize: 15, fontWeight: '700', color: '#F0EBE0', marginBottom: 4 },
+  shopBannerSub: { fontSize: 12, color: '#888888' },
+  shopBannerArrow: { fontSize: 20, color: '#C9A84C', marginLeft: 12 },
 });
