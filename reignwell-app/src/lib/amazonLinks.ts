@@ -1,130 +1,74 @@
-// Locale → { domain, tag }
-const LOCALE_MAP: Record<string, { domain: string; tag: string }> = {
-  'GB': { domain: 'amazon.co.uk', tag: 'reignwell-uk-21' },
-  'DE': { domain: 'amazon.de',    tag: 'reignwell-de-21' },
-  'FR': { domain: 'amazon.fr',    tag: 'reignwell-fr-21' },
-  'ES': { domain: 'amazon.es',    tag: 'reignwell-es-21' },
-  'IT': { domain: 'amazon.it',    tag: 'reignwell-it-21' },
+import { Linking } from 'react-native';
+
+export interface AffiliateLink {
+  label: string;
+  url: string;
+}
+
+// Maps food/nutrient keywords → Amazon search links
+// tag=reignwell-20 is a placeholder affiliate tag; replace with real one from Amazon Associates
+const TAG = 'reignwell-20';
+
+function amazonSearch(query: string): string {
+  const encoded = encodeURIComponent(query);
+  return `https://www.amazon.com/s?k=${encoded}&tag=${TAG}`;
+}
+
+const FOOD_LINKS: Record<string, AffiliateLink[]> = {
+  protein: [
+    { label: 'Whey Protein', url: amazonSearch('whey protein powder') },
+    { label: 'Protein Bars', url: amazonSearch('protein bars') },
+  ],
+  omega: [
+    { label: 'Omega-3 Fish Oil', url: amazonSearch('omega-3 fish oil capsules') },
+  ],
+  vitamin_d: [
+    { label: 'Vitamin D3', url: amazonSearch('vitamin d3 supplement 5000iu') },
+  ],
+  b12: [
+    { label: 'Vitamin B12', url: amazonSearch('vitamin b12 supplement methylcobalamin') },
+  ],
+  iron: [
+    { label: 'Iron Supplement', url: amazonSearch('iron supplement gentle') },
+  ],
+  calcium: [
+    { label: 'Calcium + D3', url: amazonSearch('calcium vitamin d supplement') },
+  ],
+  zinc: [
+    { label: 'Zinc Supplement', url: amazonSearch('zinc supplement 25mg') },
+  ],
+  magnesium: [
+    { label: 'Magnesium', url: amazonSearch('magnesium glycinate supplement') },
+  ],
 };
 
-const DEFAULT_STORE = { domain: 'amazon.com', tag: 'reignwell-20' };
+// Returns 1-2 affiliate chips relevant to a meal name
+export function getLinksForMeal(mealName: string): AffiliateLink[] {
+  const name = mealName.toLowerCase();
+  const results: AffiliateLink[] = [];
 
-/** Returns the BCP-47 locale string from the JS runtime (e.g. "en-GB", "de-DE"). */
-export function getLocale(): string {
-  try {
-    return Intl.DateTimeFormat().resolvedOptions().locale ?? 'en-US';
-  } catch {
-    return 'en-US';
+  if (name.includes('chicken') || name.includes('egg') || name.includes('beef') ||
+      name.includes('salmon') || name.includes('paneer') || name.includes('yogurt')) {
+    results.push(...FOOD_LINKS.protein.slice(0, 1));
   }
+  if (name.includes('salmon') || name.includes('fish')) {
+    results.push(...FOOD_LINKS.omega);
+  }
+
+  return results.slice(0, 2);
 }
 
-function countryFromLocale(locale: string): string {
-  // BCP-47: language[-script]-REGION, e.g. "en-GB", "de-DE", "zh-Hans-CN"
-  const parts = locale.split('-');
-  // Last part that is exactly 2 uppercase letters is the region
-  for (let i = parts.length - 1; i >= 0; i--) {
-    if (/^[A-Z]{2}$/.test(parts[i])) return parts[i];
+// Fixed supplement discovery links shown at the bottom of Food Log
+export const SUPPLEMENT_EXPLORE_LINKS: AffiliateLink[] = [
+  { label: '🧬 Multivitamin', url: amazonSearch('multivitamin daily') },
+  { label: '🐟 Omega-3',      url: amazonSearch('omega-3 fish oil capsules') },
+  { label: '☀️ Vitamin D3',   url: amazonSearch('vitamin d3 supplement') },
+  { label: '💪 Protein',      url: amazonSearch('whey protein powder') },
+];
+
+export async function openAffiliateLink(url: string): Promise<void> {
+  const supported = await Linking.canOpenURL(url);
+  if (supported) {
+    await Linking.openURL(url);
   }
-  return '';
-}
-
-function getStore(locale: string): { domain: string; tag: string } {
-  const region = countryFromLocale(locale);
-  return LOCALE_MAP[region] ?? DEFAULT_STORE;
-}
-
-/**
- * Returns a full Amazon search URL for `query`, affiliate-tagged for the
- * user's detected locale.
- *
- * Example: getAmazonLink("whey protein")
- *   → "https://www.amazon.co.uk/s?k=whey+protein&tag=reignwell-uk-21" (for UK)
- */
-export function getAmazonLink(query: string): string {
-  const locale = getLocale();
-  const store = getStore(locale);
-  const encoded = encodeURIComponent(query.trim()).replace(/%20/g, '+');
-  return `https://www.${store.domain}/s?k=${encoded}&tag=${store.tag}`;
-}
-
-export interface ProductSuggestion {
-  label: string;
-  query: string;
-}
-
-/**
- * Maps a food name (from the food log) to relevant supplement suggestions.
- * Returns up to 2 suggestions.
- */
-export function getSuggestedProducts(foodName: string): ProductSuggestion[] {
-  const name = foodName.toLowerCase();
-
-  // Protein-rich foods → protein supps
-  if (/chicken|beef|egg|salmon|tuna|steak|turkey|pork|protein/.test(name)) {
-    return [
-      { label: 'Whey Protein Powder', query: 'whey protein powder' },
-      { label: 'Protein Bars',        query: 'high protein bars' },
-    ];
-  }
-
-  // Iron-rich / iron-deficient foods
-  if (/spinach|lentil|dal|bean|tofu|broccoli|iron/.test(name)) {
-    return [
-      { label: 'Iron Supplement',   query: 'iron supplement tablets' },
-      { label: 'Vitamin C (boosts iron absorption)', query: 'vitamin c supplement' },
-    ];
-  }
-
-  // Fatty fish → omega-3
-  if (/salmon|tuna|mackerel|sardine|fish/.test(name)) {
-    return [
-      { label: 'Omega-3 Fish Oil', query: 'omega 3 fish oil capsules' },
-    ];
-  }
-
-  // Dairy / calcium
-  if (/milk|cheese|yogurt|yoghurt|paneer/.test(name)) {
-    return [
-      { label: 'Calcium + Vitamin D3', query: 'calcium vitamin d3 supplement' },
-      { label: 'Vitamin D3',           query: 'vitamin d3 supplement 4000iu' },
-    ];
-  }
-
-  // Greens / veg → multivitamin
-  if (/salad|broccoli|kale|spinach|vegetable|veg|green/.test(name)) {
-    return [
-      { label: 'Multivitamin',         query: 'multivitamin supplement daily' },
-      { label: 'Vitamin D3',           query: 'vitamin d3 supplement 4000iu' },
-    ];
-  }
-
-  // Carb-heavy / energy foods → B vitamins
-  if (/rice|bread|oat|pasta|roti|idli|dosa|noodle/.test(name)) {
-    return [
-      { label: 'B-Complex Vitamins', query: 'vitamin b complex supplement' },
-      { label: 'Magnesium',          query: 'magnesium glycinate supplement' },
-    ];
-  }
-
-  // Nuts / seeds → magnesium
-  if (/almond|walnut|peanut|cashew|seed|nut/.test(name)) {
-    return [
-      { label: 'Magnesium Glycinate', query: 'magnesium glycinate supplement' },
-      { label: 'Zinc Supplement',     query: 'zinc supplement tablets' },
-    ];
-  }
-
-  // Fruit → general antioxidants
-  if (/apple|banana|berry|blueberry|orange|mango|fruit/.test(name)) {
-    return [
-      { label: 'Vitamin C',   query: 'vitamin c 1000mg supplement' },
-      { label: 'Multivitamin', query: 'multivitamin supplement daily' },
-    ];
-  }
-
-  // Default fallback
-  return [
-    { label: 'Health Supplements', query: 'health supplements bundle' },
-    { label: 'Multivitamin',       query: 'multivitamin supplement daily' },
-  ];
 }

@@ -3,6 +3,7 @@ import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, Animated,
   Modal, TextInput, FlatList, Alert, ActivityIndicator,
 } from 'react-native';
+import { getLinksForMeal, SUPPLEMENT_EXPLORE_LINKS, openAffiliateLink } from '../lib/amazonLinks';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import * as ImagePicker from 'expo-image-picker';
 import {
@@ -241,23 +242,59 @@ export default function FoodLogScreen() {
       {meals.length === 0 ? (
         <Text style={styles.emptyText}>No meals logged yet. Tap the button above to add your first meal.</Text>
       ) : (
-        meals.map((meal) => (
-          <TouchableOpacity key={meal.id} style={styles.mealRow} onLongPress={() => removeFood(meal.id)}>
-            <Text style={styles.mealEmoji}>{meal.emoji}</Text>
-            <View style={styles.mealInfo}>
-              <Text style={styles.mealName}>{meal.name}</Text>
-              <Text style={styles.mealTime}>
-                {meal.time}{meal.source === 'ai_camera' ? ' · AI' : ''}
-              </Text>
+        meals.map((meal) => {
+          const links = getLinksForMeal(meal.name);
+          return (
+            <View key={meal.id}>
+              <TouchableOpacity style={styles.mealRow} onLongPress={() => removeFood(meal.id)}>
+                <Text style={styles.mealEmoji}>{meal.emoji}</Text>
+                <View style={styles.mealInfo}>
+                  <Text style={styles.mealName}>{meal.name}</Text>
+                  <Text style={styles.mealTime}>
+                    {meal.time}{meal.source === 'ai_camera' ? ' · AI' : ''}
+                  </Text>
+                </View>
+                <Text style={styles.mealKcal}>{meal.kcal} kcal</Text>
+              </TouchableOpacity>
+              {links.length > 0 && (
+                <View style={styles.affiliateRow}>
+                  {links.map((link) => (
+                    <TouchableOpacity
+                      key={link.url}
+                      style={styles.affiliateChip}
+                      onPress={() => openAffiliateLink(link.url)}
+                    >
+                      <Text style={styles.affiliateChipText}>🛒 {link.label}</Text>
+                    </TouchableOpacity>
+                  ))}
+                </View>
+              )}
             </View>
-            <Text style={styles.mealKcal}>{meal.kcal} kcal</Text>
-          </TouchableOpacity>
-        ))
+          );
+        })
       )}
 
       <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
         <Text style={styles.addBtnText}>+ Add manually</Text>
       </TouchableOpacity>
+
+      {/* Explore Supplements card */}
+      <View style={styles.exploreCard}>
+        <Text style={styles.exploreTitle}>Explore Supplements</Text>
+        <Text style={styles.exploreSub}>Fuel your goals — shop on Amazon</Text>
+        <View style={styles.exploreChips}>
+          {SUPPLEMENT_EXPLORE_LINKS.map((link) => (
+            <TouchableOpacity
+              key={link.url}
+              style={styles.exploreChip}
+              onPress={() => openAffiliateLink(link.url)}
+            >
+              <Text style={styles.exploreChipText}>{link.label}</Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+        <Text style={styles.exploreDisclosure}>Affiliate links · ReignWell earns a small commission</Text>
+      </View>
 
       {/* Food Search Modal */}
       <Modal visible={modalVisible} animationType="slide" presentationStyle="pageSheet">
@@ -448,4 +485,23 @@ const styles = StyleSheet.create({
     paddingVertical: 14, alignItems: 'center', marginTop: 4,
   },
   addBtnText: { color: '#666666', fontSize: 14, fontWeight: '500' },
+  affiliateRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, paddingHorizontal: 4, paddingBottom: 10, marginTop: -4 },
+  affiliateChip: {
+    backgroundColor: '#FBF6EC', borderRadius: 20, borderWidth: 1,
+    borderColor: '#E8D5A0', paddingHorizontal: 10, paddingVertical: 5,
+  },
+  affiliateChipText: { fontSize: 11, color: '#8a6a1a', fontWeight: '600' },
+  exploreCard: {
+    marginTop: 24, borderRadius: 16, backgroundColor: '#111111',
+    padding: 20,
+  },
+  exploreTitle: { fontSize: 16, fontWeight: '700', color: '#F0EBE0', marginBottom: 4 },
+  exploreSub: { fontSize: 12, color: '#888888', marginBottom: 14 },
+  exploreChips: { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: 12 },
+  exploreChip: {
+    backgroundColor: '#232120', borderRadius: 20, borderWidth: 1,
+    borderColor: '#C9A84C', paddingHorizontal: 12, paddingVertical: 7,
+  },
+  exploreChipText: { fontSize: 12, color: '#C9A84C', fontWeight: '600' },
+  exploreDisclosure: { fontSize: 10, color: '#555555', textAlign: 'center' },
 });
