@@ -1,5 +1,5 @@
-import React, { useState, useCallback } from 'react';
-import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
+import React, { useState, useCallback, useRef, useEffect } from 'react';
+import { View, Text, ScrollView, StyleSheet, TouchableOpacity, DeviceEventEmitter } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../context/AuthContext';
@@ -57,8 +57,18 @@ export default function DashboardScreen() {
 
   const { habits: habitList, toggle: toggleHabit } = useHabits();
 
+  const scrollViewRef = useRef<ScrollView>(null);
+  const waterSectionY = useRef(0);
+
+  useEffect(() => {
+    const sub = DeviceEventEmitter.addListener('scrollToWater', () => {
+      scrollViewRef.current?.scrollTo({ y: waterSectionY.current, animated: true });
+    });
+    return () => sub.remove();
+  }, []);
+
   return (
-    <ScrollView style={styles.container} contentContainerStyle={styles.content}>
+    <ScrollView ref={scrollViewRef} style={styles.container} contentContainerStyle={styles.content}>
       <View style={styles.header}>
         <View>
           <Text style={styles.greeting}>{getGreeting()},</Text>
@@ -108,7 +118,7 @@ export default function DashboardScreen() {
       </View>
 
       {/* Water Tracker */}
-      <View style={styles.waterCard}>
+      <View style={styles.waterCard} onLayout={e => { waterSectionY.current = e.nativeEvent.layout.y; }}>
         <Text style={styles.cardLabel}>HYDRATION</Text>
         <View style={styles.waterRow}>
           <WaterRing ml={waterMl} goalMl={GOAL_ML} />

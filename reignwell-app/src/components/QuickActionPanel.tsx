@@ -1,7 +1,7 @@
 import React, { useState, useRef } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, Animated,
-  Modal, Pressable, ToastAndroid, Platform, Alert,
+  Modal, Pressable, ToastAndroid, Platform, Alert, DeviceEventEmitter,
 } from 'react-native';
 
 function comingSoon(feature: string) {
@@ -60,7 +60,7 @@ export default function QuickActionPanel({ onNavigate }: Props) {
     [
       { icon: '🎙️', label: 'Voice Log', onPress: () => { hide(); setTimeout(() => setVoiceModalOpen(true), 240); } },
       { icon: '🍽️', label: 'Custom Add', onPress: () => onNavigate('FoodLog') },
-      { icon: '💧', label: 'Water',      onPress: () => onNavigate('Dashboard') },
+      { icon: '💧', label: 'Water',      onPress: () => { onNavigate('Dashboard'); DeviceEventEmitter.emit('scrollToWater'); } },
     ],
   ];
 
