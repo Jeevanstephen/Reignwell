@@ -1,199 +1,51 @@
-import AsyncStorage from '@react-native-async-storage/async-storage';
+export type RiskLevel = 'green' | 'amber' | 'red';
 
-const BLOOD_LOG_KEY = 'rw_blood_log';
+export interface MarkerReading {
+  value: number;
+  date: string; // YYYY-MM-DD
+}
 
-export type RiskLevel = 'optimal' | 'borderline' | 'at-risk';
-
-export interface MarkerDefinition {
+export interface BloodMarker {
   id: string;
   name: string;
   unit: string;
-  euRange: [number, number];       // general EU reference range
-  optimal: [number, number];
-  borderline: [number, number][];  // ranges that are borderline (can be multiple)
-  // values outside optimal AND not borderline are 'at-risk'
-  description: string;
+  group: 'Metabolic' | 'Lipids' | 'Nutrients' | 'Hormones';
+  refMin: number;
+  refMax: number;
+  readings: MarkerReading[];
 }
 
-export interface BloodReading {
-  markerId: string;
-  value: number;
-  date: string;        // YYYY-MM-DD
-  riskLevel: RiskLevel;
+function risk(value: number, min: number, max: number): RiskLevel {
+  if (value < min || value > max) return 'red';
+  const lo = min + (max - min) * 0.2;
+  const hi = min + (max - min) * 0.8;
+  if (value < lo || value > hi) return 'amber';
+  return 'green';
 }
 
-const MARKER_DEFINITIONS: MarkerDefinition[] = [
-  {
-    id: 'glucose',
-    name: 'Glucose (Fasting)',
-    unit: 'mmol/L',
-    euRange: [3.9, 5.5],
-    optimal: [3.9, 5.5],
-    borderline: [[5.6, 6.9]],
-    description: 'Fasting blood glucose. Values ≥7.0 indicate diabetes.',
-  },
-  {
-    id: 'hba1c',
-    name: 'HbA1c',
-    unit: '%',
-    euRange: [4.0, 5.6],
-    optimal: [4.0, 5.6],
-    borderline: [[5.7, 6.4]],
-    description: '3-month average blood sugar. ≥6.5% = diabetes.',
-  },
-  {
-    id: 'total_chol',
-    name: 'Total Cholesterol',
-    unit: 'mmol/L',
-    euRange: [0, 5.0],
-    optimal: [0, 5.0],
-    borderline: [[5.0, 6.2]],
-    description: 'Total blood cholesterol. European target <5.0 mmol/L.',
-  },
-  {
-    id: 'ldl',
-    name: 'LDL Cholesterol',
-    unit: 'mmol/L',
-    euRange: [0, 3.0],
-    optimal: [0, 2.6],
-    borderline: [[2.6, 3.4]],
-    description: '"Bad" cholesterol. Lower is better for heart health.',
-  },
-  {
-    id: 'hdl',
-    name: 'HDL Cholesterol',
-    unit: 'mmol/L',
-    euRange: [1.0, 2.5],
-    optimal: [1.6, 2.5],
-    borderline: [[1.0, 1.59]],
-    description: '"Good" cholesterol. Higher is protective for the heart.',
-  },
-  {
-    id: 'triglycerides',
-    name: 'Triglycerides',
-    unit: 'mmol/L',
-    euRange: [0, 1.7],
-    optimal: [0, 1.7],
-    borderline: [[1.7, 2.2]],
-    description: 'Blood fats. Elevated values raise cardiovascular risk.',
-  },
-  {
-    id: 'ferritin',
-    name: 'Ferritin',
-    unit: 'μg/L',
-    euRange: [15, 200],
-    optimal: [30, 150],
-    borderline: [[15, 29], [151, 200]],
-    description: 'Iron storage protein. Low = iron deficiency.',
-  },
-  {
-    id: 'vitamin_d',
-    name: 'Vitamin D (25-OH)',
-    unit: 'nmol/L',
-    euRange: [50, 200],
-    optimal: [75, 200],
-    borderline: [[50, 74]],
-    description: 'Vitamin D status. <50 nmol/L = deficiency.',
-  },
-  {
-    id: 'tsh',
-    name: 'TSH (Thyroid)',
-    unit: 'mU/L',
-    euRange: [0.4, 4.0],
-    optimal: [0.4, 2.5],
-    borderline: [[2.5, 4.0]],
-    description: 'Thyroid-stimulating hormone. Outside range = thyroid issue.',
-  },
-  {
-    id: 'crp',
-    name: 'CRP (Inflammation)',
-    unit: 'mg/L',
-    euRange: [0, 3.0],
-    optimal: [0, 1.0],
-    borderline: [[1.0, 3.0]],
-    description: 'C-reactive protein. Elevated = systemic inflammation.',
-  },
-  {
-    id: 'testosterone',
-    name: 'Testosterone (Total)',
-    unit: 'nmol/L',
-    euRange: [8.7, 29.4],  // adult males; females typically 0.3–2.4
-    optimal: [15.0, 29.4],
-    borderline: [[8.7, 14.9]],
-    description: 'Total testosterone. Low levels affect energy and mood.',
-  },
-  {
-    id: 'haemoglobin',
-    name: 'Haemoglobin',
-    unit: 'g/dL',
-    euRange: [12.0, 17.5],
-    optimal: [13.5, 17.5],
-    borderline: [[12.0, 13.4]],
-    description: 'Oxygen-carrying protein in red blood cells. Low = anaemia.',
-  },
+export const markers: BloodMarker[] = [
+  // Metabolic
+  { id: 'glucose',    name: 'Glucose',       unit: 'mmol/L', group: 'Metabolic', refMin: 3.9,  refMax: 5.6,  readings: [{ value: 5.1, date: '2026-11-01' }, { value: 5.3, date: '2026-09-15' }, { value: 4.9, date: '2026-07-10' }] },
+  { id: 'hba1c',      name: 'HbA1c',         unit: '%',      group: 'Metabolic', refMin: 4.0,  refMax: 5.6,  readings: [{ value: 5.2, date: '2026-11-01' }, { value: 5.4, date: '2026-09-15' }] },
+  { id: 'creatinine', name: 'Creatinine',    unit: 'µmol/L', group: 'Metabolic', refMin: 62,   refMax: 115,  readings: [{ value: 88,  date: '2026-11-01' }, { value: 92,  date: '2026-09-15' }, { value: 85, date: '2026-07-10' }] },
+  // Lipids
+  { id: 'ldl',        name: 'LDL Cholesterol', unit: 'mmol/L', group: 'Lipids', refMin: 1.0, refMax: 3.0,  readings: [{ value: 3.4, date: '2026-11-01' }, { value: 3.1, date: '2026-09-15' }, { value: 3.6, date: '2026-07-10' }] },
+  { id: 'hdl',        name: 'HDL Cholesterol', unit: 'mmol/L', group: 'Lipids', refMin: 1.0, refMax: 3.5,  readings: [{ value: 1.4, date: '2026-11-01' }, { value: 1.3, date: '2026-09-15' }] },
+  { id: 'triglyc',    name: 'Triglycerides',   unit: 'mmol/L', group: 'Lipids', refMin: 0.0, refMax: 1.7,  readings: [{ value: 1.2, date: '2026-11-01' }, { value: 1.5, date: '2026-09-15' }, { value: 0.9, date: '2026-07-10' }] },
+  // Nutrients
+  { id: 'vitd',       name: 'Vitamin D',   unit: 'nmol/L', group: 'Nutrients', refMin: 50,  refMax: 150, readings: [{ value: 42,  date: '2026-11-01' }, { value: 38, date: '2026-09-15' }, { value: 55, date: '2026-07-10' }] },
+  { id: 'b12',        name: 'Vitamin B12', unit: 'pmol/L', group: 'Nutrients', refMin: 148, refMax: 616, readings: [{ value: 290, date: '2026-11-01' }, { value: 260, date: '2026-09-15' }] },
+  { id: 'ferritin',   name: 'Ferritin',    unit: 'µg/L',   group: 'Nutrients', refMin: 15,  refMax: 200, readings: [{ value: 68,  date: '2026-11-01' }, { value: 72, date: '2026-09-15' }, { value: 60, date: '2026-07-10' }] },
+  // Hormones
+  { id: 'tsh',        name: 'TSH',         unit: 'mIU/L',  group: 'Hormones',  refMin: 0.4, refMax: 4.0, readings: [{ value: 2.1, date: '2026-11-01' }, { value: 1.9, date: '2026-09-15' }] },
+  { id: 'testosterone', name: 'Testosterone', unit: 'nmol/L', group: 'Hormones', refMin: 9.9, refMax: 27.8, readings: [{ value: 18.4, date: '2026-11-01' }, { value: 17.2, date: '2026-09-15' }, { value: 19.0, date: '2026-07-10' }] },
+  { id: 'cortisol',   name: 'Cortisol',    unit: 'nmol/L', group: 'Hormones',  refMin: 171, refMax: 536, readings: [{ value: 480, date: '2026-11-01' }, { value: 390, date: '2026-09-15' }] },
 ];
 
-// ---- Risk classification ----
-
-export function getRiskLevel(markerId: string, value: number): RiskLevel {
-  const def = MARKER_DEFINITIONS.find(m => m.id === markerId);
-  if (!def) return 'at-risk';
-
-  const [optMin, optMax] = def.optimal;
-  if (value >= optMin && value <= optMax) return 'optimal';
-
-  for (const [bMin, bMax] of def.borderline) {
-    if (value >= bMin && value <= bMax) return 'borderline';
-  }
-
-  return 'at-risk';
+export function getRisk(marker: BloodMarker): RiskLevel {
+  const latest = marker.readings[0];
+  if (!latest) return 'amber';
+  return risk(latest.value, marker.refMin, marker.refMax);
 }
 
-// ---- Persistence ----
-
-type LogStore = Record<string, BloodReading[]>; // markerId → readings[]
-
-async function readLog(): Promise<LogStore> {
-  const raw = await AsyncStorage.getItem(BLOOD_LOG_KEY);
-  return raw ? JSON.parse(raw) : {};
-}
-
-async function writeLog(store: LogStore): Promise<void> {
-  await AsyncStorage.setItem(BLOOD_LOG_KEY, JSON.stringify(store));
-}
-
-export async function logMarker(
-  markerId: string,
-  value: number,
-  date: string = new Date().toISOString().slice(0, 10),
-): Promise<BloodReading> {
-  const reading: BloodReading = {
-    markerId,
-    value,
-    date,
-    riskLevel: getRiskLevel(markerId, value),
-  };
-  const store = await readLog();
-  store[markerId] = [reading, ...(store[markerId] ?? [])].sort(
-    (a, b) => b.date.localeCompare(a.date),
-  );
-  await writeLog(store);
-  return reading;
-}
-
-export async function getMarkerHistory(markerId: string): Promise<BloodReading[]> {
-  const store = await readLog();
-  return store[markerId] ?? [];
-}
-
-export async function getLatestMarkers(): Promise<BloodReading[]> {
-  const store = await readLog();
-  return Object.values(store)
-    .map(readings => readings[0])
-    .filter(Boolean)
-    .sort((a, b) => b.date.localeCompare(a.date));
-}
-
-export function getAllMarkerDefinitions(): MarkerDefinition[] {
-  return MARKER_DEFINITIONS;
-}
+export const GROUPS = ['Metabolic', 'Lipids', 'Nutrients', 'Hormones'] as const;
