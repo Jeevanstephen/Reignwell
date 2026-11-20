@@ -5,7 +5,9 @@ import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../context/AuthContext';
 import ScoreRing from '../components/ScoreRing';
 import WaterRing from '../components/WaterRing';
+import HabitRow from '../components/HabitRow';
 import { addWater, undoWater, getWaterToday, GOAL_ML } from '../lib/waterTracker';
+import { useHabits } from '../hooks/useHabits';
 import { MainTabParamList } from '../navigation/MainNavigator';
 
 const NUTRIENTS = [
@@ -52,6 +54,8 @@ export default function DashboardScreen() {
     undoWater();
     setWaterMl(getWaterToday());
   }, []);
+
+  const { habits: habitList, toggle: toggleHabit } = useHabits();
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -123,6 +127,26 @@ export default function DashboardScreen() {
         </View>
       </View>
 
+      {/* Today's Habits */}
+      <View style={styles.habitsCard}>
+        <View style={styles.habitsHeader}>
+          <Text style={styles.cardLabel}>TODAY'S HABITS</Text>
+          <Text style={styles.habitsDone}>
+            {habitList.filter((h: any) => h.done).length}/{habitList.length} done
+          </Text>
+        </View>
+        {habitList.map((h: any) => (
+          <HabitRow
+            key={h.id}
+            icon={h.emoji}
+            name={h.label}
+            streak={h.streak}
+            checked={h.done}
+            onToggle={() => toggleHabit(h.id)}
+          />
+        ))}
+      </View>
+
       {/* Priority Action */}
       <View style={styles.priorityCard}>
         <Text style={styles.priorityLabel}>Today's Priority</Text>
@@ -179,6 +203,21 @@ const styles = StyleSheet.create({
   statusDot: { width: 8, height: 8, borderRadius: 4, marginBottom: 8 },
   nutrientValue: { fontSize: 18, fontWeight: '700', color: '#111111' },
   nutrientName: { fontSize: 11, color: '#666666', marginTop: 2, textAlign: 'center' },
+  habitsCard: {
+    backgroundColor: '#FFFFFF',
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: '#F0F0F0',
+    padding: 20,
+    marginBottom: 24,
+  },
+  habitsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 4,
+  },
+  habitsDone: { fontSize: 12, color: '#999999', fontWeight: '600' },
   waterCard: {
     backgroundColor: '#F7F7F7',
     borderRadius: 16,
