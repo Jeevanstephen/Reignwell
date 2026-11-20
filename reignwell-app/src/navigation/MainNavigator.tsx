@@ -3,12 +3,24 @@ import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import { Text } from 'react-native';
 import DashboardScreen from '../screens/DashboardScreen';
 import FoodLogScreen from '../screens/FoodLogScreen';
-import { MainTabParamList } from './types';
+import BloodWorkScreen from '../screens/BloodWorkScreen';
+import SupplementsScreen from '../screens/SupplementsScreen';
+import AiCoachScreen from '../screens/AiCoachScreen';
+import ConnectScreen from '../screens/ConnectScreen';
+
+export type MainTabParamList = {
+  Dashboard: undefined;
+  FoodLog: undefined;
+  BloodWork: undefined;
+  Supplements: undefined;
+  Coach: undefined;
+  Connect: undefined;
+};
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
 
 function TabIcon({ icon, focused }: { icon: string; focused: boolean }) {
-  return <Text style={{ fontSize: 20, opacity: focused ? 1 : 0.5 }}>{icon}</Text>;
+  return <Text style={{ fontSize: 19, opacity: focused ? 1 : 0.45 }}>{icon}</Text>;
 }
 
 export default function MainNavigator() {
@@ -26,23 +38,38 @@ export default function MainNavigator() {
         },
         tabBarActiveTintColor: '#C9A84C',
         tabBarInactiveTintColor: '#999999',
-        tabBarLabelStyle: { fontSize: 11, fontWeight: '600' },
+        tabBarLabelStyle: { fontSize: 10, fontWeight: '600' },
       }}
     >
       <Tab.Screen
         name="Dashboard"
         component={DashboardScreen}
-        options={{
-          tabBarIcon: ({ focused }) => <TabIcon icon="📊" focused={focused} />,
-        }}
+        options={{ tabBarIcon: ({ focused }) => <TabIcon icon="📊" focused={focused} /> }}
       />
       <Tab.Screen
         name="FoodLog"
         component={FoodLogScreen}
-        options={{
-          title: 'Food Log',
-          tabBarIcon: ({ focused }) => <TabIcon icon="🍽️" focused={focused} />,
-        }}
+        options={{ title: 'Food', tabBarIcon: ({ focused }) => <TabIcon icon="🍽️" focused={focused} /> }}
+      />
+      <Tab.Screen
+        name="BloodWork"
+        component={BloodWorkScreen}
+        options={{ title: 'Blood', tabBarIcon: ({ focused }) => <TabIcon icon="🩸" focused={focused} /> }}
+      />
+      <Tab.Screen
+        name="Supplements"
+        component={SupplementsScreen}
+        options={{ title: 'Supps', tabBarIcon: ({ focused }) => <TabIcon icon="💊" focused={focused} /> }}
+      />
+      <Tab.Screen
+        name="Coach"
+        component={AiCoachScreen}
+        options={{ title: 'Coach', tabBarIcon: ({ focused }) => <TabIcon icon="✦" focused={focused} /> }}
+      />
+      <Tab.Screen
+        name="Connect"
+        component={ConnectScreen}
+        options={{ title: 'Connect', tabBarIcon: ({ focused }) => <TabIcon icon="⌚" focused={focused} /> }}
       />
     </Tab.Navigator>
   );

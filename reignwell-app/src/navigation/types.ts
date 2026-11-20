@@ -7,4 +7,8 @@ export type AuthStackParamList = {
 export type MainTabParamList = {
   Dashboard: undefined;
   FoodLog: undefined;
+  BloodWork: undefined;
+  Supplements: undefined;
+  Coach: undefined;
+  Connect: undefined;
 };
