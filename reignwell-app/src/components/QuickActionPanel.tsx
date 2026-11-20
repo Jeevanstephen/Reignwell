@@ -64,9 +64,10 @@ export default function QuickActionPanel({ onNavigate }: Props) {
   ];
 
   const MY_DAY: ActionItem[] = [
-    { icon: '💊', label: 'Supplement', onPress: () => onNavigate('Supplements') },
-    { icon: '📖', label: 'Journal',    onPress: () => comingSoon('Journal') },
     { icon: '🏋️', label: 'Workout',   onPress: () => onNavigate('GymTracker') },
+    { icon: '🍴', label: 'Meal Ideas', onPress: () => onNavigate('MealSuggestions') },
+    { icon: '💊', label: 'Regimens',  onPress: () => onNavigate('Regimens') },
+    { icon: '📖', label: 'Journal',   onPress: () => comingSoon('Journal') },
   ];
 
   const spin = rotateAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '45deg'] });
@@ -110,20 +111,22 @@ export default function QuickActionPanel({ onNavigate }: Props) {
 
           {/* MY DAY */}
           <Text style={[styles.sectionLabel, { marginTop: 20 }]}>MY DAY</Text>
-          <View style={styles.actionRow}>
-            {MY_DAY.map((item) => (
-              <TouchableOpacity
-                key={item.label}
-                style={styles.actionBtn}
-                onPress={() => press(item.onPress)}
-              >
-                <View style={styles.actionIcon}>
-                  <Text style={styles.actionEmoji}>{item.icon}</Text>
-                </View>
-                <Text style={styles.actionLabel}>{item.label}</Text>
-              </TouchableOpacity>
-            ))}
-          </View>
+          {[MY_DAY.slice(0, 3), MY_DAY.slice(3)].filter(r => r.length > 0).map((row, ri) => (
+            <View key={ri} style={styles.actionRow}>
+              {row.map((item) => (
+                <TouchableOpacity
+                  key={item.label}
+                  style={styles.actionBtn}
+                  onPress={() => press(item.onPress)}
+                >
+                  <View style={styles.actionIcon}>
+                    <Text style={styles.actionEmoji}>{item.icon}</Text>
+                  </View>
+                  <Text style={styles.actionLabel}>{item.label}</Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+          ))}
 
           <View style={styles.safeBottom} />
         </Animated.View>

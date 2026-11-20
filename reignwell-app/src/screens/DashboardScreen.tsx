@@ -154,8 +154,8 @@ export default function DashboardScreen() {
         <Text style={styles.priorityText}>
           Your Vitamin D is at 38% — below optimal range. Consider 15 mins of sun exposure or a D3 supplement.
         </Text>
-        <TouchableOpacity style={styles.priorityBtn} onPress={() => navigation.navigate('Supplements')}>
-          <Text style={styles.priorityBtnText}>View Supplements</Text>
+        <TouchableOpacity style={styles.priorityBtn} onPress={() => (navigation as any).navigate('Regimens')}>
+          <Text style={styles.priorityBtnText}>View Regimens</Text>
         </TouchableOpacity>
       </View>
     </ScrollView>

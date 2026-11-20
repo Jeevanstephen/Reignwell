@@ -6,25 +6,27 @@ import { Text } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import DashboardScreen from '../screens/DashboardScreen';
 import FoodLogScreen from '../screens/FoodLogScreen';
-import BloodWorkScreen from '../screens/BloodWorkScreen';
-import SupplementsScreen from '../screens/SupplementsScreen';
-import AiCoachScreen from '../screens/AiCoachScreen';
-import ConnectScreen from '../screens/ConnectScreen';
+import ProgressScreen from '../screens/ProgressScreen';
+import ProfileScreen from '../screens/ProfileScreen';
 import GymTrackerScreen from '../screens/GymTrackerScreen';
+import RegimensScreen from '../screens/RegimensScreen';
+import BloodMarkersScreen from '../screens/BloodMarkersScreen';
+import MealSuggestionsScreen from '../screens/MealSuggestionsScreen';
 import QuickActionPanel from '../components/QuickActionPanel';
 
 export type MainTabParamList = {
   Dashboard: undefined;
   FoodLog: undefined;
-  BloodWork: undefined;
-  Supplements: undefined;
-  Coach: undefined;
-  Connect: undefined;
+  Progress: undefined;
+  Profile: undefined;
 };
 
 export type RootStackParamList = {
   Tabs: undefined;
   GymTracker: undefined;
+  Regimens: undefined;
+  BloodMarkers: undefined;
+  MealSuggestions: undefined;
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -38,8 +40,9 @@ function TabsWithPanel() {
   const navigation = useNavigation<any>();
 
   const handleNavigate = (screen: string) => {
-    if (screen === 'GymTracker') {
-      navigation.navigate('GymTracker');
+    const stackScreens = ['GymTracker', 'Regimens', 'BloodMarkers', 'MealSuggestions'];
+    if (stackScreens.includes(screen)) {
+      navigation.navigate(screen);
     } else {
       navigation.navigate('Tabs', { screen });
     }
@@ -74,24 +77,14 @@ function TabsWithPanel() {
           options={{ title: 'Food', tabBarIcon: ({ focused }) => <TabIcon icon="🍽️" focused={focused} /> }}
         />
         <Tab.Screen
-          name="BloodWork"
-          component={BloodWorkScreen}
-          options={{ title: 'Blood', tabBarIcon: ({ focused }) => <TabIcon icon="🩸" focused={focused} /> }}
+          name="Progress"
+          component={ProgressScreen}
+          options={{ title: 'Progress', tabBarIcon: ({ focused }) => <TabIcon icon="📈" focused={focused} /> }}
         />
         <Tab.Screen
-          name="Supplements"
-          component={SupplementsScreen}
-          options={{ title: 'Supps', tabBarIcon: ({ focused }) => <TabIcon icon="💊" focused={focused} /> }}
-        />
-        <Tab.Screen
-          name="Coach"
-          component={AiCoachScreen}
-          options={{ title: 'Coach', tabBarIcon: ({ focused }) => <TabIcon icon="✦" focused={focused} /> }}
-        />
-        <Tab.Screen
-          name="Connect"
-          component={ConnectScreen}
-          options={{ title: 'Connect', tabBarIcon: ({ focused }) => <TabIcon icon="⌚" focused={focused} /> }}
+          name="Profile"
+          component={ProfileScreen}
+          options={{ title: 'Profile', tabBarIcon: ({ focused }) => <TabIcon icon="👤" focused={focused} /> }}
         />
       </Tab.Navigator>
       <QuickActionPanel onNavigate={handleNavigate} />
@@ -104,6 +97,9 @@ export default function MainNavigator() {
     <Stack.Navigator screenOptions={{ headerShown: false }}>
       <Stack.Screen name="Tabs" component={TabsWithPanel} />
       <Stack.Screen name="GymTracker" component={GymTrackerScreen} />
+      <Stack.Screen name="Regimens" component={RegimensScreen} />
+      <Stack.Screen name="BloodMarkers" component={BloodMarkersScreen} />
+      <Stack.Screen name="MealSuggestions" component={MealSuggestionsScreen} />
     </Stack.Navigator>
   );
 }
