@@ -268,6 +268,9 @@ body.app-open { overflow: hidden; }
 .feature-title { font-weight: 700; font-size: 19px; margin-bottom: 10px; }
 .feature-text { font-size: 14px; color: var(--fg2); line-height: 1.65; }
 .feature-card.featured .feature-text { color: rgba(255,255,255,0.55); }
+.feature-new-badge { font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; background: var(--accent); color: #111; padding: 2px 8px; border-radius: 20px; }
+.feature-card--photo { border: 1.5px solid var(--accent) !important; position: relative; overflow: hidden; }
+.feature-card--photo::before { content: ''; position: absolute; inset: 0; background: linear-gradient(135deg, rgba(201,168,76,0.07) 0%, transparent 60%); pointer-events: none; }
 
 /* Blood markers in dark card */
 .markers-preview { display: flex; flex-direction: column; gap: 14px; }
@@ -418,6 +421,100 @@ body.app-open { overflow: hidden; }
 .fi-kcal { font-weight: 700; font-size: 12px; font-variant-numeric: tabular-nums; }
 .add-btn { width: 100%; padding: 11px; border-radius: var(--r-sm); border: 1.5px dashed var(--border); background: none; color: var(--fg3); font-size: 12px; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 5px; transition: border-color 0.15s, color 0.15s; cursor: pointer; margin-bottom: 16px; }
 .add-btn:hover { border-color: var(--accent); color: var(--accent); }
+
+/* ── PHOTO LOG MODAL ── */
+.photo-modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.75); z-index: 999; display: flex; align-items: flex-end; justify-content: center; opacity: 0; pointer-events: none; transition: opacity 0.25s; }
+.photo-modal-overlay.open { opacity: 1; pointer-events: all; }
+.photo-modal { background: var(--bg); border-radius: 24px 24px 0 0; width: 100%; max-width: 390px; padding: 20px 20px 32px; transform: translateY(100%); transition: transform 0.3s cubic-bezier(0.34,1.56,0.64,1); }
+.photo-modal-overlay.open .photo-modal { transform: translateY(0); }
+.pml-handle { width: 36px; height: 4px; background: var(--border); border-radius: 999px; margin: 0 auto 16px; }
+.pml-title { font-family: 'Space Grotesk', sans-serif; font-size: 16px; font-weight: 800; margin-bottom: 4px; }
+.pml-sub { font-size: 11px; color: var(--fg3); margin-bottom: 16px; }
+.pml-camera-area { background: #0d0d0d; border-radius: var(--r); aspect-ratio: 4/3; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; margin-bottom: 14px; overflow: hidden; position: relative; cursor: pointer; border: none; }
+.pml-corner { position: absolute; width: 20px; height: 20px; border-color: var(--accent); border-style: solid; }
+.pml-corner-tl { top: 11px; left: 11px; border-width: 2px 0 0 2px; border-radius: 3px 0 0 0; }
+.pml-corner-tr { top: 11px; right: 11px; border-width: 2px 2px 0 0; border-radius: 0 3px 0 0; }
+.pml-corner-bl { bottom: 11px; left: 11px; border-width: 0 0 2px 2px; border-radius: 0 0 0 3px; }
+.pml-corner-br { bottom: 11px; right: 11px; border-width: 0 2px 2px 0; border-radius: 0 0 3px 0; }
+.pml-vf-icon { font-size: 42px; opacity: 0.25; }
+.pml-vf-hint { font-size: 11px; color: rgba(255,255,255,0.5); font-weight: 600; letter-spacing: 0.04em; }
+.pml-scanning { display: none; position: absolute; inset: 0; background: rgba(0,0,0,0.78); flex-direction: column; align-items: center; justify-content: center; gap: 14px; }
+.pml-scanning.active { display: flex; }
+.pml-scan-frame { width: 72%; aspect-ratio: 1; border: 1.5px solid rgba(201,168,76,0.4); border-radius: 10px; position: relative; display: flex; align-items: center; justify-content: center; }
+.pml-scan-line { position: absolute; width: 100%; height: 2px; background: linear-gradient(to right, transparent, var(--accent), transparent); border-radius: 1px; box-shadow: 0 0 10px var(--accent); animation: scanLine 1.6s ease-in-out infinite; }
+@keyframes scanLine { 0%,100% { top: 8%; opacity: 0; } 10%,90% { opacity: 1; } 50% { top: 88%; } }
+.pml-scan-dots { display: flex; gap: 5px; }
+.pml-scan-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--accent); animation: scanDot 1s ease-in-out infinite; }
+.pml-scan-dot:nth-child(2) { animation-delay: 0.2s; }
+.pml-scan-dot:nth-child(3) { animation-delay: 0.4s; }
+@keyframes scanDot { 0%,100% { opacity: 0.3; transform: scale(0.8); } 50% { opacity: 1; transform: scale(1); } }
+.pml-scan-label { color: rgba(255,255,255,0.8); font-size: 11px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase; }
+.pml-capture-row { display: flex; align-items: center; justify-content: center; margin-bottom: 12px; }
+.pml-shutter { width: 56px; height: 56px; border-radius: 50%; background: #fff; border: 3px solid rgba(255,255,255,0.3); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: transform 0.12s, box-shadow 0.12s; box-shadow: 0 0 0 5px rgba(255,255,255,0.1); }
+.pml-shutter:hover { transform: scale(1.06); box-shadow: 0 0 0 7px rgba(255,255,255,0.15); }
+.pml-shutter-inner { width: 42px; height: 42px; border-radius: 50%; background: #fff; border: 2px solid #e0e0e0; }
+.pml-or { font-size: 10px; color: var(--fg3); text-align: center; margin-bottom: 8px; }
+.pml-photo-btn { background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 11px; display: flex; align-items: center; justify-content: center; gap: 8px; color: var(--fg2); font-size: 12px; font-weight: 600; cursor: pointer; transition: border-color 0.15s, color 0.15s; width: 100%; }
+.pml-photo-btn:hover { border-color: var(--accent); color: var(--accent); }
+.pml-result { display: none; }
+.pml-result.active { display: block; }
+.pml-result-intro { font-size: 12px; color: var(--fg3); margin-bottom: 12px; }
+.pml-food-card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--r-sm); padding: 14px; display: flex; align-items: center; gap: 12px; margin-bottom: 12px; }
+.pml-food-emoji { font-size: 30px; }
+.pml-food-info { flex: 1; min-width: 0; }
+.pml-food-name { font-weight: 700; font-size: 14px; margin-bottom: 3px; }
+.pml-food-macros { font-size: 11px; color: var(--fg3); }
+.pml-food-kcal { font-weight: 800; font-size: 15px; color: var(--accent); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.pml-macro-mini { display: grid; grid-template-columns: repeat(3,1fr); gap: 6px; margin-bottom: 14px; }
+.pml-mm { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 8px 6px; text-align: center; }
+.pml-mm-val { font-family: 'Space Grotesk', sans-serif; font-weight: 800; font-size: 15px; line-height: 1; }
+.pml-mm-lbl { font-size: 9px; color: var(--fg3); text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+.pml-ai-badge { display: inline-flex; align-items: center; gap: 4px; background: rgba(201,168,76,0.12); border: 1px solid rgba(201,168,76,0.25); border-radius: 999px; padding: 3px 8px; font-size: 10px; font-weight: 700; color: var(--accent); margin-bottom: 10px; }
+.pml-actions { display: flex; gap: 8px; }
+.pml-confirm { flex: 1; padding: 12px; border-radius: var(--r-sm); background: var(--accent); color: #111; font-weight: 700; font-size: 13px; border: none; cursor: pointer; transition: opacity 0.15s; }
+.pml-confirm:hover { opacity: 0.85; }
+.pml-retry { padding: 12px 14px; border-radius: var(--r-sm); background: var(--surface); border: 1px solid var(--border); color: var(--fg2); font-weight: 600; font-size: 13px; cursor: pointer; }
+.photo-banner-btn { width: 100%; background: none; border: none; padding: 0; cursor: pointer; display: block; text-align: left; border-radius: 12px; overflow: hidden; }
+
+/* ── FOOD AI CAMERA BUTTON ── */
+.food-cam-hero { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 18px 0 16px; margin-bottom: 2px; }
+.food-cam-btn { width: 64px; height: 64px; border-radius: 50%; background: var(--accent); display: flex; align-items: center; justify-content: center; cursor: pointer; border: none; position: relative; transition: transform 0.15s; }
+.food-cam-btn::before { content: ''; position: absolute; inset: -6px; border-radius: 50%; border: 2px solid rgba(201,168,76,0.3); animation: camPulse 2s ease-in-out infinite; }
+.food-cam-btn::after { content: ''; position: absolute; inset: -12px; border-radius: 50%; border: 1.5px solid rgba(201,168,76,0.12); animation: camPulse 2s ease-in-out infinite 0.4s; }
+@keyframes camPulse { 0%,100% { opacity: 1; transform: scale(1); } 50% { opacity: 0; transform: scale(1.3); } }
+.food-cam-btn:hover { transform: scale(1.05); }
+.food-cam-label { font-size: 12px; font-weight: 700; color: var(--fg2); letter-spacing: 0.03em; }
+.food-cam-sub { font-size: 10px; color: var(--fg3); }
+
+/* ── PHOTO MODAL EXTRAS ── */
+.pml-thumbnail-wrap { border-radius: var(--r); overflow: hidden; margin-bottom: 14px; position: relative; background: #111; aspect-ratio: 4/3; display: flex; align-items: center; justify-content: center; }
+.pml-thumbnail-wrap img { width: 100%; height: 100%; object-fit: cover; }
+.pml-shimmer-overlay { position: absolute; inset: 0; background: rgba(0,0,0,0.55); display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; }
+.pml-shimmer-bar { width: 60%; height: 3px; background: linear-gradient(90deg, transparent 0%, var(--accent) 50%, transparent 100%); background-size: 200% 100%; border-radius: 2px; animation: shimmerSlide 1.2s linear infinite; box-shadow: 0 0 8px var(--accent); }
+@keyframes shimmerSlide { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+.pml-identify-label { color: #fff; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; }
+.pml-cards-title { font-size: 13px; font-weight: 700; margin-bottom: 10px; }
+.pml-cards-scroll { display: flex; gap: 8px; overflow-x: auto; padding-bottom: 6px; margin-bottom: 14px; scrollbar-width: none; -ms-overflow-style: none; }
+.pml-cards-scroll::-webkit-scrollbar { display: none; }
+.pml-sug-card { flex-shrink: 0; background: var(--surface); border: 1.5px solid var(--border); border-radius: var(--r-sm); padding: 10px 12px; cursor: pointer; transition: border-color 0.15s, transform 0.12s; min-width: 90px; text-align: center; }
+.pml-sug-card:hover { border-color: var(--accent); transform: translateY(-1px); }
+.pml-sug-card.selected { border-color: var(--accent); background: rgba(201,168,76,0.08); }
+.pml-sug-emoji { font-size: 24px; margin-bottom: 4px; }
+.pml-sug-name { font-size: 10px; font-weight: 700; line-height: 1.3; }
+.pml-sug-kcal { font-size: 9px; color: var(--accent); font-weight: 700; margin-top: 3px; }
+.pml-portion-label { font-size: 11px; color: var(--fg3); font-weight: 600; margin-bottom: 7px; }
+.pml-portion-row { display: flex; gap: 6px; margin-bottom: 14px; }
+.pml-portion-pill { flex: 1; padding: 8px 4px; border-radius: 999px; border: 1.5px solid var(--border); background: none; font-size: 11px; font-weight: 700; color: var(--fg2); cursor: pointer; transition: all 0.15s; }
+.pml-portion-pill:hover { border-color: var(--accent); color: var(--accent); }
+.pml-portion-pill.on { background: var(--accent); border-color: var(--accent); color: #111; }
+.pml-macro-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 7px; margin-bottom: 10px; }
+.pml-mg-cell { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 10px; }
+.pml-mg-cell.kcal-cell { grid-column: span 2; display: flex; align-items: center; gap: 10px; }
+.pml-mg-num { font-family: 'Space Grotesk', sans-serif; font-size: 24px; font-weight: 800; line-height: 1; }
+.pml-mg-lbl { font-size: 9px; text-transform: uppercase; letter-spacing: 0.06em; color: var(--fg3); margin-top: 2px; }
+.pml-usda { display: inline-flex; align-items: center; gap: 4px; font-size: 9px; color: var(--good); font-weight: 700; margin-bottom: 12px; }
+.pml-success-toast { position: fixed; bottom: 80px; left: 50%; transform: translateX(-50%) translateY(20px); background: #111; color: #fff; border-radius: 999px; padding: 10px 18px; font-size: 12px; font-weight: 700; display: flex; align-items: center; gap: 7px; opacity: 0; transition: opacity 0.3s, transform 0.3s; z-index: 1100; white-space: nowrap; }
+.pml-success-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
 
 /* ── BLOOD ── */
 .blood-banner { background: linear-gradient(135deg,#0f0f1a,#1a1030); border-radius: var(--r); padding: 20px; margin-bottom: 16px; color: #fff; }
@@ -678,7 +775,15 @@ body.app-open { overflow: hidden; }
             <div class="m-row"><span class="m-name">Folate</span><div class="m-track"><div class="m-fill" style="width:18%;background:var(--bad)"></div></div><span class="m-val">3.2 ng/mL</span><span class="m-badge mb-b">Critical</span></div>
           </div>
         </div>
-        <div class="feature-card reveal reveal-delay-1">
+        <div class="feature-card feature-card--photo reveal reveal-delay-1">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;">
+            <div class="feature-icon">📸</div>
+            <span class="feature-new-badge">New</span>
+          </div>
+          <div class="feature-title">AI photo food logging</div>
+          <div class="feature-text">Snap a photo of any meal and get instant micronutrient analysis. Our AI identifies ingredients, estimates portions, and maps every vitamin and mineral — no barcode scanning, no manual entry.</div>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
           <div class="feature-icon">🥗</div>
           <div class="feature-title">Micronutrient food tracking</div>
           <div class="feature-text">Beyond calories. Track every vitamin and mineral from your meals, and see how close you are to your personal targets based on your blood work.</div>
@@ -891,6 +996,13 @@ body.app-open { overflow: hidden; }
         <div class="app-view" id="v-food">
           <div style="font-family:'Space Grotesk',sans-serif;font-size:19px;font-weight:800;margin-bottom:2px">Food Log</div>
           <div style="font-size:12px;color:var(--fg3);margin-bottom:16px">Today · 905 / 2100 kcal</div>
+          <div class="food-cam-hero">
+            <button class="food-cam-btn" onclick="openPhotoModal()">
+              <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            </button>
+            <div class="food-cam-label">Log with AI Camera</div>
+            <div class="food-cam-sub">Snap a photo — AI identifies nutrients instantly</div>
+          </div>
           <div class="macro-row">
             <div class="macro-tile"><div class="mt-name">Cals</div><div class="mt-num" style="color:var(--accent)">905</div><div class="mt-unit">/ 2100</div><div class="mt-bar"><div class="mt-fill" style="width:43%;background:var(--accent)"></div></div></div>
             <div class="macro-tile"><div class="mt-name">Protein</div><div class="mt-num" style="color:#5B8DEF">62g</div><div class="mt-unit">/ 150</div><div class="mt-bar"><div class="mt-fill" style="width:41%;background:#5B8DEF"></div></div></div>
@@ -917,7 +1029,7 @@ body.app-open { overflow: hidden; }
               <div style="color:#fff;font-size:10px;font-weight:600;">📸 Tap to log by photo — AI identifies nutrients</div>
             </div>
           </div>
-          <button class="add-btn" style="margin-bottom:0">+ Log dinner</button>
+          <button class="add-btn" style="margin-bottom:0" onclick="openPhotoModal()">+ Log dinner</button>
         </div>
 
         <!-- BLOOD -->
@@ -1018,6 +1130,100 @@ body.app-open { overflow: hidden; }
 
       </div><!-- /app-scroll -->
 
+      <!-- PHOTO LOG MODAL -->
+      <div class="photo-modal-overlay" id="photo-modal" onclick="if(event.target===this)closePhotoModal()">
+        <div class="photo-modal">
+          <div class="pml-handle"></div>
+
+          <!-- Camera state -->
+          <div id="pml-cam-state">
+            <div class="pml-title">Log with Camera</div>
+            <div class="pml-sub">Point at your food — AI identifies nutrients instantly</div>
+            <div class="pml-camera-area" onclick="pmlCapture()">
+              <div class="pml-corner pml-corner-tl"></div>
+              <div class="pml-corner pml-corner-tr"></div>
+              <div class="pml-corner pml-corner-bl"></div>
+              <div class="pml-corner pml-corner-br"></div>
+              <div class="pml-vf-icon">🍽️</div>
+              <div class="pml-vf-hint">Tap to capture</div>
+              <div class="pml-scanning" id="pml-scanning">
+                <div class="pml-scan-frame"><div class="pml-scan-line"></div></div>
+                <div class="pml-scan-dots"><div class="pml-scan-dot"></div><div class="pml-scan-dot"></div><div class="pml-scan-dot"></div></div>
+                <div class="pml-scan-label">AI Analysing…</div>
+              </div>
+            </div>
+            <div class="pml-capture-row">
+              <button class="pml-shutter" onclick="event.stopPropagation();pmlCapture()"><div class="pml-shutter-inner"></div></button>
+            </div>
+            <div class="pml-or">— or —</div>
+            <button class="pml-photo-btn" onclick="pmlCapture()">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              Choose from Library
+            </button>
+          </div>
+
+          <!-- Analyzing state -->
+          <div id="pml-analyze-state" style="display:none">
+            <div class="pml-title">Identifying food…</div>
+            <div class="pml-sub">AI is reading the nutritional content</div>
+            <div class="pml-thumbnail-wrap" id="pml-thumb">
+              <div style="font-size:48px">🍽️</div>
+              <div class="pml-shimmer-overlay">
+                <div class="pml-shimmer-bar"></div>
+                <div class="pml-identify-label">Analysing nutrients…</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card selection state -->
+          <div id="pml-cards-state" style="display:none">
+            <div class="pml-title">What did you eat?</div>
+            <div class="pml-sub">AI found these matches — tap the best one</div>
+            <div class="pml-cards-scroll" id="pml-cards-row"></div>
+          </div>
+
+          <!-- Portion + macros state -->
+          <div id="pml-portion-state" style="display:none">
+            <div class="pml-ai-badge">✦ <span id="pml-sel-name">Pasta</span> · USDA verified</div>
+            <div class="pml-portion-label">Portion size</div>
+            <div class="pml-portion-row">
+              <button class="pml-portion-pill" onclick="pmlSetPortion(this,'s')">Small</button>
+              <button class="pml-portion-pill on" onclick="pmlSetPortion(this,'m')">Medium</button>
+              <button class="pml-portion-pill" onclick="pmlSetPortion(this,'l')">Large</button>
+            </div>
+            <div class="pml-macro-grid">
+              <div class="pml-mg-cell kcal-cell">
+                <div>
+                  <div class="pml-mg-num" id="pml-mg-kcal" style="color:var(--accent)">395</div>
+                  <div class="pml-mg-lbl">Calories</div>
+                </div>
+                <div style="margin-left:auto;font-size:9px;color:var(--fg3);text-align:right">of 2100 goal<br><span style="color:var(--accent);font-weight:700">19%</span></div>
+              </div>
+              <div class="pml-mg-cell">
+                <div class="pml-mg-num" id="pml-mg-p" style="color:#5B8DEF">12g</div>
+                <div class="pml-mg-lbl">Protein</div>
+              </div>
+              <div class="pml-mg-cell">
+                <div class="pml-mg-num" id="pml-mg-c" style="color:var(--good)">68g</div>
+                <div class="pml-mg-lbl">Carbs</div>
+              </div>
+              <div class="pml-mg-cell">
+                <div class="pml-mg-num" id="pml-mg-f" style="color:#E8734A">8g</div>
+                <div class="pml-mg-lbl">Fat</div>
+              </div>
+            </div>
+            <div class="pml-usda">
+              <svg width="10" height="10" viewBox="0 0 12 12" fill="none"><circle cx="6" cy="6" r="6" fill="var(--good)"/><path d="M3.5 6.2l1.8 1.8 3.2-3.2" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+              Verified by USDA FoodData Central
+            </div>
+            <div class="pml-actions">
+              <button class="pml-confirm" onclick="pmlConfirm()">✓ Log this meal</button>
+              <button class="pml-retry" onclick="pmlRetry()">↩ Back</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- BOTTOM NAV -->
       <nav class="app-nav">
         <button class="app-nav-tab active" id="tab-dash" onclick="switchAppTab('dash')">
@@ -1042,6 +1248,10 @@ body.app-open { overflow: hidden; }
           <div style="position:absolute;top:6px;right:calc(50% - 18px);width:7px;height:7px;border-radius:50%;background:var(--accent);border:2px solid var(--surface)"></div>
         </button>
       </nav>
+      <div class="pml-success-toast" id="pml-toast">
+        <svg width="14" height="14" viewBox="0 0 14 14" fill="none"><circle cx="7" cy="7" r="7" fill="var(--good)"/><path d="M4 7.2l2 2 4-4" stroke="#fff" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <span id="pml-toast-text">Logged! +395 kcal</span>
+      </div>
     </div><!-- /app-screen -->
   </div><!-- /app-phone -->
 </div><!-- /app-shell -->
@@ -1147,6 +1357,175 @@ function sendAiMsg() {
     }
   }
   addMessage(response, false, 200);
+}
+
+/* ── Photo log modal ── */
+// USDA FoodData Central values per 100g; S=0.6×, M=1.0×, L=1.5×
+const pmlFoodDB = [
+  // ── Proteins ──
+  { emoji:'🍗', name:'Grilled chicken breast', kcal:{s:137,m:228,l:342}, p:{s:28,m:46,l:69}, c:{s:0,m:0,l:0}, f:{s:3,m:5,l:7} },
+  { emoji:'🥩', name:'Beef steak (sirloin)', kcal:{s:149,m:249,l:373}, p:{s:26,m:43,l:65}, c:{s:0,m:0,l:0}, f:{s:5,m:9,l:13} },
+  { emoji:'🐟', name:'Salmon fillet', kcal:{s:124,m:206,l:309}, p:{s:20,m:33,l:50}, c:{s:0,m:0,l:0}, f:{s:5,m:8,l:12} },
+  { emoji:'🍤', name:'Shrimp (steamed)', kcal:{s:60,m:99,l:149}, p:{s:14,m:24,l:36}, c:{s:1,m:1,l:2}, f:{s:1,m:1,l:2} },
+  { emoji:'🥚', name:'Boiled eggs (2)', kcal:{s:90,m:149,l:224}, p:{s:8,m:13,l:19}, c:{s:1,m:1,l:2}, f:{s:7,m:11,l:16} },
+  { emoji:'🍳', name:'Scrambled eggs on toast', kcal:{s:198,m:330,l:495}, p:{s:12,m:20,l:30}, c:{s:21,m:35,l:53}, f:{s:8,m:13,l:20} },
+  { emoji:'🧀', name:'Paneer (Indian cottage cheese)', kcal:{s:198,m:330,l:495}, p:{s:14,m:23,l:35}, c:{s:4,m:6,l:9}, f:{s:14,m:23,l:35} },
+  { emoji:'🫘', name:'Dal (lentil curry)', kcal:{s:70,m:116,l:174}, p:{s:5,m:9,l:13}, c:{s:11,m:19,l:28}, f:{s:1,m:2,l:3} },
+  { emoji:'🫘', name:'Rajma (kidney bean curry)', kcal:{s:84,m:140,l:210}, p:{s:5,m:9,l:13}, c:{s:14,m:23,l:35}, f:{s:1,m:2,l:3} },
+  { emoji:'🥜', name:'Peanut butter (2 tbsp)', kcal:{s:357,m:595,l:893}, p:{s:14,m:23,l:35}, c:{s:11,m:18,l:27}, f:{s:30,m:50,l:75} },
+  // ── Grains & carbs ──
+  { emoji:'🍚', name:'Steamed white rice', kcal:{s:86,m:143,l:214}, p:{s:2,m:3,l:4}, c:{s:19,m:32,l:48}, f:{s:0,m:0,l:0} },
+  { emoji:'🍚', name:'Brown rice (cooked)', kcal:{s:83,m:138,l:207}, p:{s:2,m:3,l:4}, c:{s:17,m:29,l:43}, f:{s:1,m:1,l:2} },
+  { emoji:'🫓', name:'Roti / chapati (1)', kcal:{s:149,m:249,l:373}, p:{s:4,m:7,l:11}, c:{s:27,m:45,l:68}, f:{s:4,m:6,l:9} },
+  { emoji:'🥣', name:'Oatmeal (cooked, plain)', kcal:{s:37,m:62,l:93}, p:{s:1,m:2,l:3}, c:{s:7,m:12,l:17}, f:{s:1,m:1,l:2} },
+  { emoji:'🍝', name:'Pasta (cooked)', kcal:{s:97,m:162,l:243}, p:{s:4,m:6,l:9}, c:{s:19,m:32,l:48}, f:{s:1,m:1,l:2} },
+  { emoji:'🍝', name:'Pasta arrabiata', kcal:{s:159,m:265,l:398}, p:{s:5,m:8,l:12}, c:{s:28,m:46,l:69}, f:{s:3,m:5,l:8} },
+  { emoji:'🥖', name:'Whole wheat bread (2 sl)', kcal:{s:149,m:249,l:373}, p:{s:7,m:12,l:18}, c:{s:27,m:45,l:68}, f:{s:2,m:3,l:5} },
+  { emoji:'🥞', name:'Pancakes (plain, 2)', kcal:{s:171,m:285,l:428}, p:{s:5,m:8,l:12}, c:{s:28,m:46,l:69}, f:{s:4,m:7,l:11} },
+  { emoji:'🌯', name:'Whole wheat wrap', kcal:{s:198,m:330,l:495}, p:{s:5,m:9,l:13}, c:{s:37,m:61,l:92}, f:{s:3,m:5,l:8} },
+  // ── Indian meals ──
+  { emoji:'🍛', name:'Chicken biryani', kcal:{s:120,m:200,l:300}, p:{s:8,m:13,l:20}, c:{s:17,m:29,l:43}, f:{s:3,m:5,l:7} },
+  { emoji:'🍛', name:'Vegetable biryani', kcal:{s:96,m:160,l:240}, p:{s:3,m:5,l:7}, c:{s:19,m:31,l:47}, f:{s:2,m:3,l:5} },
+  { emoji:'🧆', name:'Idli (steamed, 2)', kcal:{s:86,m:143,l:214}, p:{s:2,m:4,l:6}, c:{s:16,m:27,l:40}, f:{s:1,m:1,l:2} },
+  { emoji:'🥞', name:'Dosa (plain, 1 large)', kcal:{s:104,m:173,l:260}, p:{s:3,m:5,l:7}, c:{s:19,m:31,l:47}, f:{s:2,m:3,l:5} },
+  { emoji:'🍲', name:'Sambar (1 bowl)', kcal:{s:33,m:55,l:83}, p:{s:2,m:3,l:5}, c:{s:5,m:9,l:13}, f:{s:1,m:1,l:2} },
+  { emoji:'🧆', name:'Palak paneer', kcal:{s:109,m:181,l:272}, p:{s:5,m:9,l:13}, c:{s:5,m:8,l:12}, f:{s:8,m:13,l:20} },
+  { emoji:'🍛', name:'Dal makhani', kcal:{s:109,m:181,l:272}, p:{s:5,m:9,l:13}, c:{s:14,m:23,l:35}, f:{s:4,m:7,l:10} },
+  { emoji:'🫓', name:'Paratha (plain, 1)', kcal:{s:181,m:302,l:453}, p:{s:4,m:7,l:10}, c:{s:27,m:45,l:68}, f:{s:7,m:12,l:18} },
+  { emoji:'🥣', name:'Poha (flattened rice)', kcal:{s:107,m:178,l:267}, p:{s:2,m:4,l:6}, c:{s:19,m:32,l:48}, f:{s:3,m:5,l:7} },
+  { emoji:'🍢', name:'Upma', kcal:{s:102,m:170,l:255}, p:{s:3,m:4,l:7}, c:{s:17,m:28,l:42}, f:{s:3,m:5,l:7} },
+  // ── Vegetables & salads ──
+  { emoji:'🥗', name:'Caesar salad', kcal:{s:117,m:195,l:293}, p:{s:5,m:9,l:13}, c:{s:5,m:8,l:12}, f:{s:9,m:15,l:22} },
+  { emoji:'🥗', name:'Greek salad', kcal:{s:60,m:100,l:150}, p:{s:3,m:5,l:7}, c:{s:4,m:7,l:10}, f:{s:5,m:8,l:12} },
+  { emoji:'🥦', name:'Stir-fried broccoli', kcal:{s:35,m:58,l:87}, p:{s:2,m:4,l:6}, c:{s:5,m:8,l:12}, f:{s:1,m:2,l:3} },
+  { emoji:'🥕', name:'Roasted vegetables', kcal:{s:50,m:84,l:126}, p:{s:1,m:2,l:3}, c:{s:9,m:15,l:22}, f:{s:1,m:2,l:3} },
+  { emoji:'🥑', name:'Avocado (half)', kcal:{s:96,m:160,l:240}, p:{s:1,m:2,l:3}, c:{s:4,m:7,l:10}, f:{s:9,m:15,l:22} },
+  { emoji:'🥑', name:'Avocado toast', kcal:{s:186,m:310,l:465}, p:{s:5,m:8,l:12}, c:{s:19,m:32,l:48}, f:{s:11,m:18,l:27} },
+  // ── Fruits ──
+  { emoji:'🍌', name:'Banana (medium)', kcal:{s:52,m:89,l:134}, p:{s:1,m:1,l:2}, c:{s:12,m:21,l:31}, f:{s:0,m:0,l:0} },
+  { emoji:'🍎', name:'Apple (medium)', kcal:{s:31,m:52,l:78}, p:{s:0,m:0,l:0}, c:{s:8,m:14,l:21}, f:{s:0,m:0,l:0} },
+  { emoji:'🍊', name:'Orange (medium)', kcal:{s:28,m:47,l:71}, p:{s:1,m:1,l:2}, c:{s:7,m:12,l:17}, f:{s:0,m:0,l:0} },
+  { emoji:'🍓', name:'Strawberries (1 cup)', kcal:{s:19,m:32,l:48}, p:{s:0,m:1,l:1}, c:{s:5,m:8,l:12}, f:{s:0,m:0,l:0} },
+  { emoji:'🫐', name:'Blueberries (1 cup)', kcal:{s:34,m:57,l:86}, p:{s:0,m:1,l:1}, c:{s:9,m:14,l:21}, f:{s:0,m:0,l:0} },
+  // ── Dairy ──
+  { emoji:'🍦', name:'Greek yogurt (plain)', kcal:{s:37,m:62,l:93}, p:{s:4,m:7,l:10}, c:{s:3,m:5,l:8}, f:{s:1,m:2,l:3} },
+  { emoji:'🥛', name:'Whole milk (1 cup)', kcal:{s:38,m:64,l:96}, p:{s:2,m:3,l:5}, c:{s:3,m:5,l:7}, f:{s:2,m:3,l:5} },
+  { emoji:'🧈', name:'Cheddar cheese (30g)', kcal:{s:243,m:405,l:607}, p:{s:15,m:25,l:38}, c:{s:1,m:1,l:2}, f:{s:20,m:33,l:50} },
+  // ── Fast food & snacks ──
+  { emoji:'🍔', name:'Beef burger', kcal:{s:149,m:249,l:373}, p:{s:9,m:15,l:22}, c:{s:14,m:24,l:36}, f:{s:7,m:12,l:18} },
+  { emoji:'🍕', name:'Pizza (cheese, 1 slice)', kcal:{s:150,m:250,l:375}, p:{s:7,m:11,l:17}, c:{s:17,m:28,l:42}, f:{s:6,m:10,l:15} },
+  { emoji:'🌮', name:'Chicken taco', kcal:{s:120,m:200,l:300}, p:{s:8,m:14,l:21}, c:{s:14,m:24,l:36}, f:{s:5,m:8,l:12} },
+  { emoji:'🌯', name:'Chicken burrito', kcal:{s:130,m:217,l:325}, p:{s:8,m:14,l:21}, c:{s:17,m:28,l:42}, f:{s:4,m:6,l:10} },
+  { emoji:'🍟', name:'French fries (medium)', kcal:{s:168,m:280,l:420}, p:{s:3,m:4,l:6}, c:{s:22,m:36,l:54}, f:{s:8,m:14,l:21} },
+  { emoji:'🥪', name:'Chicken sandwich', kcal:{s:160,m:267,l:400}, p:{s:12,m:20,l:30}, c:{s:17,m:29,l:43}, f:{s:5,m:8,l:13} },
+  { emoji:'🧆', name:'Falafel (3 pieces)', kcal:{s:198,m:330,l:495}, p:{s:6,m:10,l:15}, c:{s:19,m:32,l:48}, f:{s:11,m:18,l:27} },
+  // ── Soups & stews ──
+  { emoji:'🍜', name:'Chicken noodle soup', kcal:{s:34,m:57,l:85}, p:{s:3,m:5,l:7}, c:{s:5,m:8,l:12}, f:{s:1,m:2,l:3} },
+  { emoji:'🥘', name:'Beef stew', kcal:{s:72,m:120,l:180}, p:{s:6,m:10,l:15}, c:{s:7,m:12,l:17}, f:{s:3,m:5,l:7} },
+  { emoji:'🍲', name:'Minestrone soup', kcal:{s:40,m:66,l:99}, p:{s:2,m:3,l:5}, c:{s:7,m:11,l:17}, f:{s:1,m:1,l:2} },
+  { emoji:'🍛', name:'Thai green curry', kcal:{s:96,m:160,l:240}, p:{s:5,m:8,l:12}, c:{s:7,m:12,l:17}, f:{s:6,m:10,l:15} },
+  // ── Breakfast ──
+  { emoji:'🥣', name:'Muesli with milk', kcal:{s:198,m:330,l:495}, p:{s:5,m:8,l:12}, c:{s:35,m:58,l:87}, f:{s:4,m:7,l:10} },
+  { emoji:'🧇', name:'Waffles (2 plain)', kcal:{s:198,m:330,l:495}, p:{s:5,m:8,l:12}, c:{s:28,m:46,l:69}, f:{s:7,m:12,l:18} },
+  { emoji:'🍌', name:'Smoothie bowl', kcal:{s:72,m:120,l:180}, p:{s:2,m:3,l:5}, c:{s:14,m:24,l:36}, f:{s:1,m:2,l:3} },
+  { emoji:'🥐', name:'Croissant', kcal:{s:264,m:440,l:660}, p:{s:5,m:8,l:12}, c:{s:25,m:41,l:62}, f:{s:16,m:27,l:40} },
+  // ── Desserts & drinks ──
+  { emoji:'🍫', name:'Dark chocolate (30g)', kcal:{s:329,m:548,l:822}, p:{s:3,m:5,l:7}, c:{s:22,m:36,l:54}, f:{s:22,m:37,l:55} },
+  { emoji:'☕', name:'Latte (medium, whole milk)', kcal:{s:71,m:118,l:177}, p:{s:4,m:7,l:10}, c:{s:7,m:11,l:17}, f:{s:3,m:5,l:7} },
+  { emoji:'🧋', name:'Bubble tea (taro, medium)', kcal:{s:139,m:231,l:347}, p:{s:1,m:2,l:3}, c:{s:28,m:46,l:69}, f:{s:4,m:6,l:9} },
+  { emoji:'🍦', name:'Ice cream (vanilla, 1 scoop)', kcal:{s:125,m:208,l:312}, p:{s:2,m:3,l:5}, c:{s:14,m:24,l:36}, f:{s:7,m:11,l:17} },
+];
+let pmlSelected = null, pmlPortion = 'm';
+
+function pmlShowState(id) {
+  ['pml-cam-state','pml-analyze-state','pml-cards-state','pml-portion-state'].forEach(s => {
+    document.getElementById(s).style.display = s === id ? '' : 'none';
+  });
+}
+function openPhotoModal() {
+  pmlRetry();
+  document.getElementById('photo-modal').classList.add('open');
+}
+function closePhotoModal() {
+  document.getElementById('photo-modal').classList.remove('open');
+}
+function pmlCapture() {
+  let inp = document.getElementById('pml-file-input');
+  if (!inp) {
+    inp = document.createElement('input');
+    inp.type = 'file'; inp.accept = 'image/*'; inp.capture = 'environment';
+    inp.id = 'pml-file-input';
+    inp.style.display = 'none';
+    document.body.appendChild(inp);
+    inp.addEventListener('change', function() {
+      const file = inp.files && inp.files[0];
+      if (!file) return;
+      const url = URL.createObjectURL(file);
+      const thumb = document.getElementById('pml-thumb');
+      if (thumb) { thumb.src = url; thumb.onload = () => URL.revokeObjectURL(url); }
+      pmlShowState('pml-analyze-state');
+      setTimeout(() => { pmlBuildCards(); pmlShowState('pml-cards-state'); }, 1500);
+      inp.value = '';
+    });
+  }
+  inp.click();
+}
+function pmlBuildCards() {
+  const row = document.getElementById('pml-cards-row');
+  row.innerHTML = '';
+  const shuffled = [...pmlFoodDB].sort(() => 0.5 - Math.random()).slice(0, 7);
+  shuffled.forEach((food, i) => {
+    const card = document.createElement('div');
+    card.className = 'pml-sug-card';
+    card.innerHTML = `<div class="pml-sug-emoji">${food.emoji}</div><div class="pml-sug-name">${food.name}</div><div class="pml-sug-kcal">${food.kcal.m} kcal</div>`;
+    card.onclick = () => pmlSelectFood(food, card);
+    row.appendChild(card);
+  });
+}
+function pmlSelectFood(food, card) {
+  document.querySelectorAll('.pml-sug-card').forEach(c => c.classList.remove('selected'));
+  card.classList.add('selected');
+  pmlSelected = food;
+  pmlPortion = 'm';
+  setTimeout(() => {
+    document.getElementById('pml-sel-name').textContent = food.name;
+    pmlUpdateMacros();
+    pmlShowState('pml-portion-state');
+  }, 180);
+}
+function pmlSetPortion(btn, size) {
+  document.querySelectorAll('.pml-portion-pill').forEach(p => p.classList.remove('on'));
+  btn.classList.add('on');
+  pmlPortion = size;
+  pmlUpdateMacros();
+}
+function pmlUpdateMacros() {
+  if (!pmlSelected) return;
+  const f = pmlSelected, s = pmlPortion;
+  document.getElementById('pml-mg-kcal').textContent = f.kcal[s];
+  document.getElementById('pml-mg-p').textContent = f.p[s] + 'g';
+  document.getElementById('pml-mg-c').textContent = f.c[s] + 'g';
+  document.getElementById('pml-mg-f').textContent = f.f[s] + 'g';
+}
+function pmlConfirm() {
+  const kcal = pmlSelected ? pmlSelected.kcal[pmlPortion] : 0;
+  // Update displayed daily kcal total
+  const sub = document.querySelector('#v-food [style*="905"]') ||
+    [...document.querySelectorAll('#v-food div')].find(el => /\d+ \/ \d+ kcal/.test(el.textContent));
+  if (sub) {
+    const m = sub.textContent.match(/(\d+) \/ (\d+) kcal/);
+    if (m) sub.textContent = `Today · ${parseInt(m[1]) + kcal} / ${m[2]} kcal`;
+  }
+  closePhotoModal();
+  const toast = document.getElementById('pml-toast');
+  document.getElementById('pml-toast-text').textContent = `Logged! +${kcal} kcal`;
+  toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 3000);
+}
+function pmlRetry() {
+  pmlShowState('pml-cam-state');
+  document.getElementById('pml-scanning').classList.remove('active');
+  pmlSelected = null;
 }
 
 /* ── Scroll reveal ── */
