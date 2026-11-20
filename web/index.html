@@ -6,7 +6,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="ReignWell">
 <link rel="apple-touch-icon" href="icon-192.png">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&family=Cinzel+Decorative:wght@700;900&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700;800&family=Cinzel+Decorative:wght@700;900&family=Cormorant+Garamond:wght@600;700&display=swap">
 
 <style>
 :root {
@@ -100,7 +100,9 @@ body.app-open { overflow: hidden; }
 .lp-logo { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 9px; }
 .logo-mark { height: 40px; display: flex; align-items: center; }
 .logo-mark svg { height: 40px; width: auto; color: #111111; }
-.logo-text { font-family: 'Cinzel Decorative', Georgia, serif; font-size: 20px; font-weight: 900; color: #111111; letter-spacing: 0.04em; line-height: 1; }
+.logo-text { font-size: 20px; line-height: 1; display: flex; align-items: baseline; }
+.logo-reign { font-family: 'Cormorant Garamond', Georgia, serif; font-style: normal; font-weight: 700; color: #111111; }
+.logo-well  { font-family: 'Space Grotesk', sans-serif; font-weight: 800; letter-spacing: 0.04em; color: #111111; }
 .logo-tagline { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg3); margin-left: 2px; align-self: flex-end; margin-bottom: 2px; }
 .lp-nav-links { display: flex; gap: 24px; list-style: none; margin-left: auto; font-size: 14px; color: var(--fg2); font-weight: 500; }
 .lp-nav-links a:hover { color: var(--fg); }
@@ -169,6 +171,18 @@ body.app-open { overflow: hidden; }
 .ph-nav-item { display: flex; flex-direction: column; align-items: center; gap: 2px; font-size: 7px; font-weight: 600; color: var(--fg3); }
 .ph-nav-item.on { color: var(--accent); }
 .ph-nav-item svg { width: 16px; height: 16px; }
+
+/* ── HERO CYCLING SCREENS ── */
+.hero-phone-wrap { cursor: pointer; }
+.hero-phone-wrap:hover .phone-frame { box-shadow: 0 40px 80px rgba(0,0,0,0.35), 0 0 0 1px rgba(201,168,76,0.3), 0 0 0 3px rgba(201,168,76,0.1); transition: box-shadow 0.3s; }
+.hero-screen { position: absolute; inset: 0; opacity: 0; transition: opacity 0.25s ease; pointer-events: none; border-radius: 44px; overflow: hidden; }
+.hero-screen.active { opacity: 1; }
+.hero-screen-inner { width: 100%; height: 100%; display: flex; flex-direction: column; overflow: hidden; background: var(--bg); }
+.hero-tap-hint { position: absolute; bottom: -36px; left: 50%; transform: translateX(-50%); font-size: 11px; color: var(--fg3); white-space: nowrap; display: flex; align-items: center; gap: 5px; }
+.hero-tap-hint svg { width: 12px; height: 12px; color: var(--accent); }
+.hero-cycle-dots { display: flex; gap: 5px; justify-content: center; margin-top: 10px; }
+.hero-dot { width: 5px; height: 5px; border-radius: 50%; background: var(--border); transition: background 0.3s, transform 0.3s; }
+.hero-dot.on { background: var(--accent); transform: scale(1.3); }
 
 /* Floating elements around phone */
 .float-el { position: absolute; }
@@ -350,8 +364,10 @@ body.app-open { overflow: hidden; }
 .app-screen { flex: 1; background: var(--bg); border-radius: 48px; overflow: hidden; display: flex; flex-direction: column; }
 .app-status-bar { padding: 38px 24px 8px; display: flex; justify-content: space-between; align-items: center; font-size: 12px; font-weight: 600; flex-shrink: 0; }
 .app-topbar { padding: 8px 20px 10px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
-.app-topbar-logo { font-family: 'Space Grotesk', sans-serif; font-size: 17px; font-weight: 800; }
-.app-topbar-logo span { color: var(--accent); }
+.app-topbar-logo { display: flex; align-items: center; gap: 6px; }
+.app-topbar-logo .logo-text { font-size: 16px; }
+.app-topbar-logo .logo-reign { color: var(--fg); }
+.app-topbar-logo .logo-well  { color: var(--fg); }
 .app-close-btn { margin-left: auto; width: 30px; height: 30px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--fg2); transition: background 0.15s; }
 .app-close-btn:hover { background: var(--fg2); color: var(--bg); }
 .app-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
@@ -614,7 +630,7 @@ body.app-open { overflow: hidden; }
 
   <nav class="lp-nav">
     <div class="lp-nav-inner">
-      <div class="lp-logo"><div class="logo-mark"><svg viewBox="52 0 396 272" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block"><path d="M52,268 C54,255 60,246 70,240 L72,18 Q95,120 125,138 Q148,88 172,66 Q192,120 207,145 L250,10 L293,145 Q308,120 328,66 Q352,88 375,138 Q405,120 428,18 L430,240 C440,246 446,255 448,268 Z M231,249 C231,235 240,225 250,225 C260,225 269,235 269,249 C269,263 260,273 250,273 C240,273 231,263 231,249 Z" fill="currentColor" fill-rule="evenodd"/></svg></div><span class="logo-text">REIGNWELL</span></div>
+      <div class="lp-logo"><div class="logo-mark"><svg viewBox="52 0 396 272" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block"><path d="M52,268 C54,255 60,246 70,240 L72,18 Q95,120 125,138 Q148,88 172,66 Q192,120 207,145 L250,10 L293,145 Q308,120 328,66 Q352,88 375,138 Q405,120 428,18 L430,240 C440,246 446,255 448,268 Z M231,249 C231,235 240,225 250,225 C260,225 269,235 269,249 C269,263 260,273 250,273 C240,273 231,263 231,249 Z" fill="currentColor" fill-rule="evenodd"/></svg></div><span class="logo-text"><span class="logo-reign">Reign</span><span class="logo-well">WELL</span></span></div>
       <ul class="lp-nav-links">
         <li><a href="#how">How it works</a></li>
         <li><a href="#features">Features</a></li>
@@ -641,7 +657,7 @@ body.app-open { overflow: hidden; }
             <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M3 20.5v-17c0-.83 1-.5 1-.5l14 8.5-14 8.5s-1 .33-1-.5z"/></svg>
             Play Store
           </button>
-          <button class="btn-accent" onclick="openApp()">Try Demo →</button>
+          <button class="btn-accent" onclick="openApp()">Tap to explore →</button>
         </div>
         <div class="lp-trust">
           <div class="trust-avatars">
@@ -661,42 +677,117 @@ body.app-open { overflow: hidden; }
       </div>
 
       <!-- Phone mockup -->
-      <div class="hero-phone-wrap">
-        <div class="phone-frame">
+      <div class="hero-phone-wrap" onclick="openApp()" title="Tap to explore the app">
+        <div class="phone-frame" style="position:relative">
           <div class="phone-notch"></div>
-          <div class="phone-screen">
-            <div class="phone-status"><span>9:41</span><span>◼◼◼ WiFi ◼</span></div>
-            <div class="phone-content">
-              <div class="ph-greeting">Good morning, Alex 👋</div>
-              <div class="ph-title">Your Daily Score</div>
-              <div class="ph-score-card">
-                <div class="ph-ring">
-                  <svg viewBox="0 0 60 60"><circle class="rb" cx="30" cy="30" r="25"/><circle class="rf" cx="30" cy="30" r="25"/></svg>
-                  <div class="ph-ring-label"><span class="n">75</span><span class="l">/ 100</span></div>
+
+          <!-- SCREEN 0: Home / Daily Score -->
+          <div class="hero-screen active" id="hscr-0">
+            <div class="hero-screen-inner">
+              <div class="phone-status"><span>9:41</span><span>◼◼◼ WiFi ◼</span></div>
+              <div class="phone-content">
+                <div class="ph-greeting">Good morning, Alex 👋</div>
+                <div class="ph-title">Your Daily Score</div>
+                <div class="ph-score-card">
+                  <div class="ph-ring">
+                    <svg viewBox="0 0 60 60"><circle class="rb" cx="30" cy="30" r="25"/><circle class="rf" cx="30" cy="30" r="25"/></svg>
+                    <div class="ph-ring-label"><span class="n">75</span><span class="l">/ 100</span></div>
+                  </div>
+                  <div class="ph-score-text">
+                    <div class="title">Looking good</div>
+                    <div class="sub">Vitamin D still low — 1 action today</div>
+                  </div>
                 </div>
-                <div class="ph-score-text">
-                  <div class="title">Looking good</div>
-                  <div class="sub">Vitamin D still low — 1 action today</div>
+                <div class="ph-nutrients">
+                  <div class="ph-nut"><div class="ph-nut-name">Iron</div><div class="ph-nut-val" style="color:var(--good)">✓</div><div class="ph-nut-bar"><div class="ph-nut-fill" style="width:100%;background:var(--good)"></div></div></div>
+                  <div class="ph-nut"><div class="ph-nut-name">Vit D</div><div class="ph-nut-val" style="color:var(--warn)">22</div><div class="ph-nut-bar"><div class="ph-nut-fill" style="width:28%;background:var(--warn)"></div></div></div>
+                  <div class="ph-nut"><div class="ph-nut-name">B12</div><div class="ph-nut-val" style="color:var(--good)">✓</div><div class="ph-nut-bar"><div class="ph-nut-fill" style="width:88%;background:var(--good)"></div></div></div>
                 </div>
+                <div class="ph-action"><div class="ico">💡</div><div class="txt"><strong>Today's priority</strong> Take D3 with lunch fat — boosts absorption 32%</div></div>
               </div>
-              <div class="ph-nutrients">
-                <div class="ph-nut"><div class="ph-nut-name">Iron</div><div class="ph-nut-val" style="color:var(--good)">✓</div><div class="ph-nut-bar"><div class="ph-nut-fill" style="width:100%;background:var(--good)"></div></div></div>
-                <div class="ph-nut"><div class="ph-nut-name">Vit D</div><div class="ph-nut-val" style="color:var(--warn)">22</div><div class="ph-nut-bar"><div class="ph-nut-fill" style="width:28%;background:var(--warn)"></div></div></div>
-                <div class="ph-nut"><div class="ph-nut-name">B12</div><div class="ph-nut-val" style="color:var(--good)">✓</div><div class="ph-nut-bar"><div class="ph-nut-fill" style="width:88%;background:var(--good)"></div></div></div>
+              <div class="ph-nav">
+                <div class="ph-nav-item on"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Home</div>
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/></svg>Food</div>
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Blood</div>
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>Supps</div>
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>AI</div>
               </div>
-              <div class="ph-action">
-                <div class="ico">💡</div>
-                <div class="txt"><strong>Today's priority</strong>Take D3 with lunch fat — boosts absorption 32%</div>
-              </div>
-            </div>
-            <div class="ph-nav">
-              <div class="ph-nav-item on"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Home</div>
-              <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/></svg>Food</div>
-              <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Blood</div>
-              <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>Supps</div>
-              <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>AI</div>
             </div>
           </div>
+
+          <!-- SCREEN 1: Food Log -->
+          <div class="hero-screen" id="hscr-1">
+            <div class="hero-screen-inner">
+              <div class="phone-status"><span>9:41</span><span>◼◼◼ WiFi ◼</span></div>
+              <div class="phone-content">
+                <div class="ph-title" style="margin-bottom:10px">Food Log</div>
+                <div style="background:var(--fg);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px">
+                  <span style="font-size:22px">🍝</span>
+                  <div style="flex:1">
+                    <div style="font-size:11px;font-weight:700;color:var(--bg)">Pasta arrabiata</div>
+                    <div style="font-size:9px;color:rgba(255,255,255,0.5)">395 kcal · P 12g · C 68g · F 8g</div>
+                  </div>
+                  <span style="font-size:9px;color:rgba(255,255,255,0.4)">Lunch</span>
+                </div>
+                <div style="background:var(--surface);border-radius:12px;padding:12px;margin-bottom:8px;display:flex;align-items:center;gap:10px;border:1px solid var(--border)">
+                  <span style="font-size:22px">🍗</span>
+                  <div style="flex:1">
+                    <div style="font-size:11px;font-weight:700">Grilled chicken</div>
+                    <div style="font-size:9px;color:var(--fg3)">228 kcal · P 46g · C 0g · F 5g</div>
+                  </div>
+                  <span style="font-size:9px;color:var(--fg3)">Dinner</span>
+                </div>
+                <div style="background:var(--accent);border-radius:10px;padding:10px 12px;display:flex;align-items:center;gap:8px;margin-top:4px">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="#111"><circle cx="12" cy="12" r="10"/><path d="M8 12l3 3 5-5" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/></svg>
+                  <div style="font-size:10px;font-weight:700;color:#111">AI Camera Log</div>
+                  <div style="font-size:8px;color:rgba(0,0,0,0.5);margin-left:auto">Snap →</div>
+                </div>
+              </div>
+              <div class="ph-nav">
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Home</div>
+                <div class="ph-nav-item on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/></svg>Food</div>
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Blood</div>
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>Supps</div>
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>AI</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- SCREEN 2: AI Coach -->
+          <div class="hero-screen" id="hscr-2">
+            <div class="hero-screen-inner">
+              <div class="phone-status"><span>9:41</span><span>◼◼◼ WiFi ◼</span></div>
+              <div class="phone-content">
+                <div class="ph-title" style="margin-bottom:10px">AI Coach</div>
+                <div style="background:var(--surface);border-radius:12px;padding:11px 12px;margin-bottom:7px;border:1px solid var(--border)">
+                  <div style="font-size:9px;color:var(--fg3);margin-bottom:3px">You asked</div>
+                  <div style="font-size:10px;font-weight:600">Why am I always tired after lunch?</div>
+                </div>
+                <div style="background:var(--fg);border-radius:12px;padding:11px 12px;margin-bottom:7px">
+                  <div style="font-size:9px;color:rgba(255,255,255,0.4);margin-bottom:3px">ReignWell AI</div>
+                  <div style="font-size:10px;color:rgba(255,255,255,0.85);line-height:1.5">Your blood glucose spikes after carb-heavy lunches. Try adding protein first — it slows absorption.</div>
+                </div>
+                <div style="background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.04));border:1px solid rgba(201,168,76,0.25);border-radius:10px;padding:9px 11px;display:flex;align-items:center;gap:8px">
+                  <span style="font-size:14px">📊</span>
+                  <div style="font-size:9px;color:var(--accent);font-weight:700">Based on 14 days of your data</div>
+                </div>
+              </div>
+              <div class="ph-nav">
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>Home</div>
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 2v7c0 1.1.9 2 2 2h4a2 2 0 0 0 2-2V2"/><path d="M7 2v20"/></svg>Food</div>
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 6v6l4 2"/></svg>Blood</div>
+                <div class="ph-nav-item"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 3H5a2 2 0 0 0-2 2v4m6-6h10a2 2 0 0 1 2 2v4M9 3v18m0 0h10a2 2 0 0 0 2-2V9M9 21H5a2 2 0 0 1-2-2V9m0 0h18"/></svg>Supps</div>
+                <div class="ph-nav-item on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>AI</div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+        <!-- Cycle indicator dots -->
+        <div class="hero-cycle-dots">
+          <div class="hero-dot on" id="hdot-0"></div>
+          <div class="hero-dot" id="hdot-1"></div>
+          <div class="hero-dot" id="hdot-2"></div>
         </div>
         <!-- Floating cards -->
         <div class="float-el fc1">
@@ -949,7 +1040,7 @@ body.app-open { overflow: hidden; }
         <span>🔋</span>
       </div>
       <div class="app-topbar">
-        <div class="app-topbar-logo" style="display:flex;align-items:center;gap:6px"><svg width="18" height="14" viewBox="0 0 56 44" fill="none"><defs><linearGradient id="ag1" x1="28" y1="0" x2="28" y2="44" gradientUnits="userSpaceOnUse"><stop offset="0%" stop-color="#D4D4D4"/><stop offset="100%" stop-color="#5A5A5A"/></linearGradient></defs><path d="M4 36 L8 14 L18 26 L28 4 L38 26 L48 14 L52 36 Z" fill="url(#ag1)" stroke="#444" stroke-width="1.5" stroke-linejoin="round"/><rect x="4" y="36" width="48" height="6" rx="2" fill="url(#ag1)"/></svg><span style="font-weight:800">Reign</span><span style="font-weight:400">Well</span></div>
+        <div class="app-topbar-logo"><svg width="18" height="14" viewBox="0 0 56 44" fill="none"><path d="M4 36 L8 14 L18 26 L28 4 L38 26 L48 14 L52 36 Z" fill="var(--fg)" stroke="none"/><rect x="4" y="36" width="48" height="6" rx="2" fill="var(--fg)"/></svg><span class="logo-text"><span class="logo-reign">Reign</span><span class="logo-well">WELL</span></span></div>
         <div style="margin-left:auto;font-size:11px;font-weight:600;background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent-dk);padding:4px 10px;border-radius:999px;">Demo</div>
         <button class="app-close-btn" onclick="closeApp()">✕</button>
       </div>
@@ -1528,6 +1619,43 @@ function pmlRetry() {
   pmlSelected = null;
 }
 
+/* ── Hero cycling screens ── */
+(function() {
+  var screens = [0, 1, 2];
+  var current = 0;
+  var timer = null;
+
+  function showScreen(idx) {
+    screens.forEach(function(i) {
+      var s = document.getElementById('hscr-' + i);
+      var d = document.getElementById('hdot-' + i);
+      if (s) s.classList.toggle('active', i === idx);
+      if (d) d.classList.toggle('on', i === idx);
+    });
+    current = idx;
+  }
+
+  function startCycle() {
+    if (timer) return;
+    timer = setInterval(function() {
+      showScreen((current + 1) % 3);
+    }, 3000);
+  }
+
+  function initHero() {
+    var wrap = document.querySelector('.hero-phone-wrap');
+    if (!wrap) return;
+    showScreen(0);
+    startCycle();
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', function() { setTimeout(initHero, 200); });
+  } else {
+    setTimeout(initHero, 200);
+  }
+})();
+
 /* ── Scroll reveal ── */
 const observer = new IntersectionObserver((entries) => {
   entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); observer.unobserve(e.target); } });
@@ -1569,6 +1697,657 @@ document.querySelectorAll('[data-count]').forEach(el => statObs.observe(el));
 
 
 
+
+<script>
+/* ════════════════════════════════════════════════════
+   REIGNWELL — Full App Functionality Layer
+   Data layer: localStorage (works offline + in artifact)
+   Backend sync: connects to /api/* when running from server
+   ════════════════════════════════════════════════════ */
+
+const API = (() => {
+  const BASE = window.location.hostname === 'localhost' ? 'http://localhost:3000/api' : null;
+  const token = () => localStorage.getItem('rw_token');
+  const headers = () => ({ 'Content-Type': 'application/json', ...(token() ? { Authorization: 'Bearer ' + token() } : {}) });
+  const req = async (method, path, body) => {
+    if (!BASE) return null;
+    try {
+      const r = await fetch(BASE + path, { method, headers: headers(), body: body ? JSON.stringify(body) : undefined });
+      return r.ok ? r.json() : null;
+    } catch { return null; }
+  };
+  return {
+    post: (p, b) => req('POST', p, b),
+    get: (p) => req('GET', p),
+    patch: (p, b) => req('PATCH', p, b),
+    del: (p) => req('DELETE', p),
+  };
+})();
+
+/* ── localStorage store ── */
+const Store = {
+  get: k => { try { return JSON.parse(localStorage.getItem('rw_' + k) || 'null'); } catch { return null; } },
+  set: (k, v) => { try { localStorage.setItem('rw_' + k, JSON.stringify(v)); } catch {} },
+  push: (k, item) => { const arr = Store.get(k) || []; arr.push(item); Store.set(k, arr); return arr; },
+  today: () => new Date().toISOString().slice(0, 10),
+};
+
+/* ═══════════════════════
+   AUTH
+   ═══════════════════════ */
+const Auth = {
+  user: () => Store.get('user'),
+  token: () => localStorage.getItem('rw_token'),
+  login(user, token) {
+    Store.set('user', user);
+    if (token) localStorage.setItem('rw_token', token);
+    Auth.updateUI();
+  },
+  logout() {
+    Store.set('user', null); localStorage.removeItem('rw_token');
+    Auth.updateUI();
+  },
+  updateUI() {
+    const u = Auth.user();
+    document.querySelectorAll('.auth-name').forEach(el => el.textContent = u ? u.name.split(' ')[0] : 'Alex');
+    document.getElementById('dash-greeting').textContent = u ? `Good ${getTimeOfDay()}, ${u.name.split(' ')[0]} 👋` : `Good ${getTimeOfDay()}, Alex 👋`;
+    const goals = u || { goal_kcal: 2100, goal_protein: 150, goal_carbs: 240, goal_fat: 70 };
+    FoodLog.renderMacroBar(null, goals);
+  }
+};
+
+function getTimeOfDay() {
+  const h = new Date().getHours();
+  return h < 12 ? 'morning' : h < 17 ? 'afternoon' : 'evening';
+}
+
+/* ── Auth Modal ── */
+function openAuthModal(mode = 'login') {
+  let modal = document.getElementById('auth-modal');
+  if (!modal) {
+    modal = document.createElement('div');
+    modal.id = 'auth-modal';
+    modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
+    modal.innerHTML = `
+      <div style="background:var(--surface);border-radius:var(--r);padding:28px;width:min(360px,92vw);box-shadow:var(--shadow-lg)">
+        <div style="font-family:'Space Grotesk',sans-serif;font-size:20px;font-weight:800;margin-bottom:4px" id="auth-title">Sign In</div>
+        <div style="font-size:12px;color:var(--fg3);margin-bottom:20px" id="auth-sub">Welcome back to ReignWell</div>
+        <div id="auth-name-row" style="display:none;margin-bottom:12px">
+          <input id="auth-name" placeholder="Full name" style="width:100%;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--fg);font-size:14px;font-family:inherit">
+        </div>
+        <div style="margin-bottom:12px">
+          <input id="auth-email" type="email" placeholder="Email address" style="width:100%;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--fg);font-size:14px;font-family:inherit">
+        </div>
+        <div style="margin-bottom:20px">
+          <input id="auth-password" type="password" placeholder="Password (6+ characters)" style="width:100%;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--fg);font-size:14px;font-family:inherit">
+        </div>
+        <div id="auth-error" style="color:var(--bad);font-size:12px;margin-bottom:12px;display:none"></div>
+        <button id="auth-submit" onclick="authSubmit()" style="width:100%;padding:13px;border-radius:var(--r-sm);background:var(--accent);color:#111;font-weight:700;font-size:14px;font-family:inherit">Sign In</button>
+        <div style="text-align:center;margin-top:14px;font-size:12px;color:var(--fg3)">
+          <span id="auth-toggle-text">Don't have an account?</span>
+          <button onclick="toggleAuthMode()" style="color:var(--accent);font-weight:700;margin-left:4px;font-size:12px;font-family:inherit" id="auth-toggle-btn">Sign up</button>
+        </div>
+        <button onclick="authSkip()" style="display:block;width:100%;margin-top:8px;padding:10px;border-radius:var(--r-sm);border:1.5px solid var(--border);font-size:12px;color:var(--fg3);font-family:inherit">Continue as guest (demo)</button>
+      </div>`;
+    document.body.appendChild(modal);
+    modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+  }
+  if (mode === 'register') toggleAuthMode();
+  modal.style.display = 'flex';
+}
+
+let authMode = 'login';
+function toggleAuthMode() {
+  authMode = authMode === 'login' ? 'register' : 'login';
+  document.getElementById('auth-title').textContent = authMode === 'login' ? 'Sign In' : 'Create Account';
+  document.getElementById('auth-sub').textContent = authMode === 'login' ? 'Welcome back to ReignWell' : 'Start tracking your health';
+  document.getElementById('auth-name-row').style.display = authMode === 'register' ? 'block' : 'none';
+  document.getElementById('auth-submit').textContent = authMode === 'login' ? 'Sign In' : 'Create Account';
+  document.getElementById('auth-toggle-text').textContent = authMode === 'login' ? "Don't have an account?" : 'Already have one?';
+  document.getElementById('auth-toggle-btn').textContent = authMode === 'login' ? 'Sign up' : 'Sign in';
+}
+
+async function authSubmit() {
+  const email = document.getElementById('auth-email').value.trim();
+  const password = document.getElementById('auth-password').value;
+  const name = document.getElementById('auth-name')?.value.trim();
+  const errEl = document.getElementById('auth-error');
+
+  if (!email || !password) { errEl.textContent = 'Email and password required'; errEl.style.display = 'block'; return; }
+
+  const btn = document.getElementById('auth-submit');
+  btn.textContent = 'Please wait…'; btn.disabled = true;
+
+  if (authMode === 'register') {
+    if (!name) { errEl.textContent = 'Name required'; errEl.style.display = 'block'; btn.textContent = 'Create Account'; btn.disabled = false; return; }
+    const result = await API.post('/auth/register', { name, email, password });
+    if (result?.token) {
+      Auth.login(result.user, result.token);
+      document.getElementById('auth-modal')?.remove();
+    } else {
+      // Offline fallback: create local account
+      Auth.login({ name, email, goal_kcal: 2100, goal_protein: 150, goal_carbs: 240, goal_fat: 70 }, null);
+      document.getElementById('auth-modal')?.remove();
+    }
+  } else {
+    const result = await API.post('/auth/login', { email, password });
+    if (result?.token) {
+      Auth.login(result.user, result.token);
+      document.getElementById('auth-modal')?.remove();
+    } else {
+      errEl.textContent = 'Invalid credentials — try guest mode for the demo';
+      errEl.style.display = 'block';
+      btn.textContent = 'Sign In'; btn.disabled = false;
+    }
+  }
+}
+
+function authSkip() {
+  Auth.login({ name: 'Alex', email: 'demo@reignwell.app', goal_kcal: 2100, goal_protein: 150, goal_carbs: 240, goal_fat: 70 }, null);
+  document.getElementById('auth-modal')?.remove();
+}
+
+/* ═══════════════════════
+   FOOD LOG
+   ═══════════════════════ */
+const FoodLog = {
+  todayKey: () => 'food_' + Store.today(),
+  entries: () => Store.get(FoodLog.todayKey()) || [],
+  goals: () => Auth.user() || { goal_kcal: 2100, goal_protein: 150, goal_carbs: 240, goal_fat: 70 },
+
+  add(entry) {
+    const e = { ...entry, id: Date.now(), date: Store.today(), loggedAt: new Date().toISOString() };
+    const entries = Store.push(FoodLog.todayKey(), e);
+    if (API) API.post('/food', entry).catch(() => {});
+    FoodLog.render();
+    return e;
+  },
+
+  remove(id) {
+    const entries = FoodLog.entries().filter(e => e.id !== id);
+    Store.set(FoodLog.todayKey(), entries);
+    FoodLog.render();
+  },
+
+  totals() {
+    return FoodLog.entries().reduce((acc, e) => ({
+      kcal: acc.kcal + (e.kcal || 0),
+      protein_g: acc.protein_g + (e.protein_g || 0),
+      carbs_g: acc.carbs_g + (e.carbs_g || 0),
+      fat_g: acc.fat_g + (e.fat_g || 0),
+    }), { kcal: 0, protein_g: 0, carbs_g: 0, fat_g: 0 });
+  },
+
+  render() {
+    const totals = FoodLog.totals();
+    const goals = FoodLog.goals();
+    FoodLog.renderMacroBar(totals, goals);
+    FoodLog.renderMeals();
+  },
+
+  renderMacroBar(totals, goals) {
+    totals = totals || FoodLog.totals();
+    // Update food log header
+    const hdr = document.querySelector('#v-food [style*="905"]') ||
+      [...(document.querySelectorAll('#v-food div') || [])].find(el => /\d+ \/ \d+ kcal/.test(el.textContent));
+    if (hdr) hdr.textContent = `Today · ${totals.kcal} / ${goals.goal_kcal} kcal`;
+
+    // Update macro tiles
+    const tiles = document.querySelectorAll('#v-food .macro-tile');
+    if (tiles.length >= 4) {
+      const vals = [
+        { num: totals.kcal, goal: goals.goal_kcal, pct: totals.kcal / goals.goal_kcal },
+        { num: Math.round(totals.protein_g) + 'g', goal: goals.goal_protein, pct: totals.protein_g / goals.goal_protein },
+        { num: Math.round(totals.carbs_g) + 'g', goal: goals.goal_carbs, pct: totals.carbs_g / goals.goal_carbs },
+        { num: Math.round(totals.fat_g) + 'g', goal: goals.goal_fat, pct: totals.fat_g / goals.goal_fat },
+      ];
+      tiles.forEach((tile, i) => {
+        const v = vals[i];
+        const numEl = tile.querySelector('.mt-num');
+        const fillEl = tile.querySelector('.mt-fill');
+        const unitEl = tile.querySelector('.mt-unit');
+        if (numEl) numEl.textContent = v.num;
+        if (fillEl) fillEl.style.width = Math.min(100, Math.round(v.pct * 100)) + '%';
+        if (unitEl && i > 0) unitEl.textContent = '/ ' + (i === 1 ? goals.goal_protein : i === 2 ? goals.goal_carbs : goals.goal_fat);
+      });
+    }
+
+    // Dashboard calorie ring
+    const dashCal = document.getElementById('dash-kcal');
+    if (dashCal) dashCal.textContent = totals.kcal;
+  },
+
+  renderMeals() {
+    const entries = FoodLog.entries();
+    const meals = { breakfast: [], lunch: [], dinner: [], snack: [] };
+    entries.forEach(e => { if (meals[e.meal]) meals[e.meal].push(e); });
+    ['breakfast', 'lunch', 'dinner'].forEach(meal => {
+      const container = document.getElementById('meal-list-' + meal);
+      if (!container) return;
+      container.innerHTML = '';
+      meals[meal].forEach(e => {
+        const item = document.createElement('div');
+        item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border)';
+        item.innerHTML = `<span style="font-size:22px">${e.emoji || '🍽️'}</span>
+          <div style="flex:1"><div style="font-weight:600;font-size:13px">${e.food_name}</div><div style="font-size:11px;color:var(--fg3)">${e.kcal} kcal · P${Math.round(e.protein_g||0)}g C${Math.round(e.carbs_g||0)}g F${Math.round(e.fat_g||0)}g · ${e.portion==='s'?'Small':e.portion==='l'?'Large':'Medium'}</div></div>
+          <button onclick="FoodLog.remove(${e.id})" style="color:var(--fg3);font-size:16px;padding:4px 8px;border-radius:6px" title="Remove">×</button>`;
+        container.appendChild(item);
+      });
+    });
+  },
+
+  openAddModal(meal) {
+    let modal = document.getElementById('food-add-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'food-add-modal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px)';
+      modal.innerHTML = `
+        <div style="background:var(--surface);border-radius:var(--r) var(--r) 0 0;padding:24px;width:min(480px,100%);box-shadow:var(--shadow-lg);max-height:90vh;overflow-y:auto">
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;margin-bottom:16px" id="food-add-title">Add to Breakfast</div>
+          <input id="food-search" placeholder="Search food (e.g. chicken, rice, dal…)" oninput="FoodLog.search()" style="width:100%;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--fg);font-size:14px;font-family:inherit;margin-bottom:12px">
+          <div id="food-search-results" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;max-height:200px;overflow-y:auto"></div>
+          <div id="food-selected-row" style="display:none;padding:12px;background:rgba(201,168,76,0.08);border:1.5px solid var(--accent);border-radius:var(--r-sm);margin-bottom:12px">
+            <div style="font-weight:700;font-size:13px" id="food-sel-label"></div>
+            <div style="font-size:11px;color:var(--fg3);margin-top:2px" id="food-sel-macros"></div>
+            <div style="display:flex;gap:6px;margin-top:10px">
+              <button class="pml-portion-pill" onclick="FoodLog.setPortion(this,'s')">Small</button>
+              <button class="pml-portion-pill on" onclick="FoodLog.setPortion(this,'m')">Medium</button>
+              <button class="pml-portion-pill" onclick="FoodLog.setPortion(this,'l')">Large</button>
+            </div>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="FoodLog.confirmAdd()" style="flex:1;padding:13px;border-radius:var(--r-sm);background:var(--accent);color:#111;font-weight:700;font-size:14px;font-family:inherit">Log Food</button>
+            <button onclick="document.getElementById('food-add-modal').remove()" style="padding:13px 18px;border-radius:var(--r-sm);border:1.5px solid var(--border);font-size:14px;font-family:inherit;color:var(--fg3)">Cancel</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+      modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    }
+    modal._meal = meal;
+    modal._selected = null;
+    modal._portion = 'm';
+    document.getElementById('food-add-title').textContent = 'Add to ' + meal.charAt(0).toUpperCase() + meal.slice(1);
+    document.getElementById('food-search').value = '';
+    document.getElementById('food-search-results').innerHTML = '';
+    document.getElementById('food-selected-row').style.display = 'none';
+    // Show popular foods
+    FoodLog.showResults(pmlFoodDB.slice(0, 12));
+    modal.style.display = 'flex';
+    setTimeout(() => document.getElementById('food-search')?.focus(), 100);
+  },
+
+  search() {
+    const q = document.getElementById('food-search').value.toLowerCase().trim();
+    const results = q ? pmlFoodDB.filter(f => f.name.toLowerCase().includes(q)) : pmlFoodDB.slice(0, 12);
+    FoodLog.showResults(results.slice(0, 16));
+  },
+
+  showResults(foods) {
+    const container = document.getElementById('food-search-results');
+    container.innerHTML = '';
+    foods.forEach(food => {
+      const btn = document.createElement('button');
+      btn.style.cssText = 'display:flex;align-items:center;gap:6px;padding:7px 10px;border-radius:999px;border:1.5px solid var(--border);background:var(--bg);font-size:12px;font-family:inherit;cursor:pointer;transition:border-color 0.15s';
+      btn.innerHTML = `${food.emoji} ${food.name}`;
+      btn.onclick = () => FoodLog.selectFood(food);
+      container.appendChild(btn);
+    });
+  },
+
+  _selectedFood: null, _portion: 'm',
+  selectFood(food) {
+    FoodLog._selectedFood = food;
+    FoodLog._portion = 'm';
+    document.getElementById('food-selected-row').style.display = 'block';
+    document.getElementById('food-sel-label').textContent = food.emoji + ' ' + food.name;
+    FoodLog.updateSelectedMacros();
+    document.querySelectorAll('#food-add-modal .pml-portion-pill').forEach((p, i) => p.classList.toggle('on', i === 1));
+  },
+
+  updateSelectedMacros() {
+    const f = FoodLog._selectedFood, s = FoodLog._portion;
+    if (!f) return;
+    document.getElementById('food-sel-macros').textContent = `${f.kcal[s]} kcal · Protein ${f.p[s]}g · Carbs ${f.c[s]}g · Fat ${f.f[s]}g`;
+  },
+
+  setPortion(btn, size) {
+    FoodLog._portion = size;
+    document.querySelectorAll('#food-add-modal .pml-portion-pill').forEach(p => p.classList.remove('on'));
+    btn.classList.add('on');
+    FoodLog.updateSelectedMacros();
+  },
+
+  confirmAdd() {
+    const f = FoodLog._selectedFood;
+    if (!f) { document.getElementById('food-search')?.focus(); return; }
+    const s = FoodLog._portion;
+    const modal = document.getElementById('food-add-modal');
+    FoodLog.add({
+      meal: modal?._meal || 'snack', food_name: f.name, emoji: f.emoji,
+      kcal: f.kcal[s], protein_g: f.p[s], carbs_g: f.c[s], fat_g: f.f[s], portion: s,
+    });
+    modal?.remove();
+    showToast(`✓ ${f.name} logged!`);
+  }
+};
+
+/* Wire up add-btn clicks with meal IDs */
+document.addEventListener('DOMContentLoaded', () => {
+  // Insert meal list containers + wire add buttons
+  [['breakfast','🌅 Breakfast'], ['lunch','☀️ Lunch'], ['dinner','🌙 Dinner']].forEach(([meal, label]) => {
+    const addBtns = [...document.querySelectorAll('#v-food .add-btn')].filter(b => b.textContent.toLowerCase().includes(meal) || b.textContent.toLowerCase().includes(label.split(' ')[1]?.toLowerCase() || ''));
+    addBtns.forEach(btn => {
+      if (!btn.hasAttribute('data-meal')) {
+        btn.setAttribute('data-meal', meal);
+        const existing = btn.onclick;
+        btn.onclick = () => FoodLog.openAddModal(meal);
+      }
+      // Insert a meal-list div before this button if not present
+      const listId = 'meal-list-' + meal;
+      if (!document.getElementById(listId)) {
+        const div = document.createElement('div');
+        div.id = listId;
+        btn.parentNode.insertBefore(div, btn);
+      }
+    });
+  });
+
+  FoodLog.render();
+  Auth.updateUI();
+  BloodLog.render();
+  WeightLog.render();
+});
+
+/* ═══════════════════════
+   BLOOD MARKERS
+   ═══════════════════════ */
+const BloodLog = {
+  entries: () => Store.get('blood_markers') || getDefaultBloodMarkers(),
+  add(entries) {
+    const existing = BloodLog.entries();
+    entries.forEach(e => {
+      const idx = existing.findIndex(x => x.marker === e.marker);
+      if (idx >= 0) existing[idx] = { ...existing[idx], ...e, id: existing[idx].id };
+      else existing.push({ ...e, id: Date.now() + Math.random(), created_at: new Date().toISOString() });
+    });
+    Store.set('blood_markers', existing);
+    BloodLog.render();
+  },
+  remove(id) {
+    Store.set('blood_markers', BloodLog.entries().filter(e => e.id !== id));
+    BloodLog.render();
+  },
+  render() {
+    const entries = BloodLog.entries();
+    const container = document.getElementById('blood-markers-list');
+    if (!container) return;
+    container.innerHTML = '';
+    entries.forEach(e => {
+      const statusColor = { optimal: 'var(--good)', normal: 'var(--accent)', low: 'var(--bad)', high: 'var(--warn)', critical: 'var(--bad)' }[e.status] || 'var(--fg3)';
+      const item = document.createElement('div');
+      item.style.cssText = 'display:flex;align-items:center;gap:10px;padding:12px 0;border-bottom:1px solid var(--border)';
+      item.innerHTML = `
+        <div style="width:36px;height:36px;border-radius:50%;background:${statusColor}22;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;color:${statusColor}">${e.value}</div>
+        <div style="flex:1">
+          <div style="font-weight:700;font-size:13px">${e.marker}</div>
+          <div style="font-size:11px;color:var(--fg3)">${e.unit} · Tested ${e.test_date}</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:8px">
+          <span style="font-size:10px;font-weight:700;padding:3px 8px;border-radius:999px;background:${statusColor}22;color:${statusColor}">${e.status}</span>
+          <button onclick="BloodLog.remove(${JSON.stringify(e.id)})" style="color:var(--fg3);font-size:14px;padding:2px 6px" title="Remove">×</button>
+        </div>`;
+      container.appendChild(item);
+    });
+  },
+  openAddModal() {
+    const markers = ['Vitamin D','B12','Folate','Ferritin','Iron','Magnesium','Zinc','TSH','HbA1c','CRP','Testosterone','Cortisol'];
+    let modal = document.getElementById('blood-add-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'blood-add-modal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;display:flex;align-items:flex-end;justify-content:center;backdrop-filter:blur(8px)';
+      modal.innerHTML = `
+        <div style="background:var(--surface);border-radius:var(--r) var(--r) 0 0;padding:24px;width:min(480px,100%);box-shadow:var(--shadow-lg)">
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;margin-bottom:16px">Log Blood Marker</div>
+          <div style="display:flex;gap:10px;margin-bottom:12px">
+            <select id="blood-marker-sel" style="flex:1;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--fg);font-size:14px;font-family:inherit">
+              ${markers.map(m => `<option value="${m}">${m}</option>`).join('')}
+            </select>
+          </div>
+          <div style="display:flex;gap:10px;margin-bottom:12px">
+            <input id="blood-value" type="number" step="0.1" placeholder="Value" style="flex:1;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--fg);font-size:14px;font-family:inherit">
+            <input id="blood-unit" placeholder="Unit (e.g. ng/mL)" style="flex:1;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--fg);font-size:14px;font-family:inherit">
+          </div>
+          <div style="margin-bottom:20px">
+            <input id="blood-date" type="date" value="${Store.today()}" style="width:100%;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--fg);font-size:14px;font-family:inherit">
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="BloodLog.confirmAdd()" style="flex:1;padding:13px;border-radius:var(--r-sm);background:var(--accent);color:#111;font-weight:700;font-size:14px;font-family:inherit">Save Result</button>
+            <button onclick="document.getElementById('blood-add-modal').remove()" style="padding:13px 18px;border-radius:var(--r-sm);border:1.5px solid var(--border);font-size:14px;font-family:inherit;color:var(--fg3)">Cancel</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+      modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+      // Auto-fill unit on marker change
+      const units = { 'Vitamin D':'ng/mL','B12':'pg/mL','Folate':'ng/mL','Ferritin':'ng/mL','Iron':'µg/dL','Magnesium':'mg/dL','Zinc':'µg/dL','TSH':'mIU/L','HbA1c':'%','CRP':'mg/L','Testosterone':'ng/dL','Cortisol':'µg/dL' };
+      document.getElementById('blood-marker-sel').onchange = function() {
+        document.getElementById('blood-unit').value = units[this.value] || '';
+      };
+      document.getElementById('blood-unit').value = units[markers[0]];
+    }
+    modal.style.display = 'flex';
+    setTimeout(() => document.getElementById('blood-value')?.focus(), 100);
+  },
+  confirmAdd() {
+    const marker = document.getElementById('blood-marker-sel').value;
+    const value = parseFloat(document.getElementById('blood-value').value);
+    const unit = document.getElementById('blood-unit').value.trim();
+    const test_date = document.getElementById('blood-date').value;
+    if (!marker || isNaN(value) || !unit || !test_date) { showToast('Fill all fields'); return; }
+    BloodLog.add([{ marker, value, unit, test_date, status: deriveBloodStatus(marker, value) }]);
+    document.getElementById('blood-add-modal')?.remove();
+    showToast('✓ Blood marker saved');
+    API.post('/blood', [{ marker, value, unit, test_date }]).catch(() => {});
+  }
+};
+
+function deriveBloodStatus(marker, value) {
+  const ranges = { 'Vitamin D':{low:20,opt:50,high:100},'B12':{low:200,opt:400,high:900},'Folate':{low:5,opt:10,high:20},'Ferritin':{low:12,opt:50,high:150},'Iron':{low:60,opt:100,high:170},'Magnesium':{low:1.7,opt:2.0,high:2.5},'Zinc':{low:60,opt:90,high:130},'TSH':{low:0.4,opt:2.0,high:4.0},'HbA1c':{low:0,opt:5.0,high:5.7},'CRP':{low:0,opt:0.5,high:3.0} };
+  const r = ranges[marker];
+  if (!r) return 'normal';
+  if (value < r.low) return 'low';
+  if (value > r.high) return 'high';
+  if (value >= r.opt) return 'optimal';
+  return 'normal';
+}
+
+function getDefaultBloodMarkers() {
+  return [
+    { id:1, marker:'Vitamin D', value:22, unit:'ng/mL', status:'low', test_date:'2026-10-15' },
+    { id:2, marker:'B12', value:410, unit:'pg/mL', status:'optimal', test_date:'2026-10-15' },
+    { id:3, marker:'Folate', value:3.2, unit:'ng/mL', status:'low', test_date:'2026-10-15' },
+    { id:4, marker:'Ferritin', value:68, unit:'ng/mL', status:'optimal', test_date:'2026-10-15' },
+    { id:5, marker:'Magnesium', value:1.8, unit:'mg/dL', status:'normal', test_date:'2026-10-15' },
+  ];
+}
+
+/* ── Wire blood tab ── */
+function setupBloodTab() {
+  const bloodView = document.getElementById('v-blood');
+  if (!bloodView || document.getElementById('blood-markers-list')) return;
+  // Insert marker list and add button
+  const banner = bloodView.querySelector('.blood-banner');
+  if (banner) {
+    const listDiv = document.createElement('div');
+    listDiv.id = 'blood-markers-list';
+    listDiv.style.cssText = 'margin-bottom:16px';
+    banner.after(listDiv);
+
+    const addBtn = document.createElement('button');
+    addBtn.className = 'add-btn';
+    addBtn.style.cssText = 'margin-bottom:0';
+    addBtn.textContent = '+ Add blood test result';
+    addBtn.onclick = () => BloodLog.openAddModal();
+    listDiv.after(addBtn);
+  }
+  BloodLog.render();
+}
+
+/* ═══════════════════════
+   WEIGHT LOG
+   ═══════════════════════ */
+const WeightLog = {
+  entries: () => Store.get('weight_log') || [],
+  add(weight_kg, date) {
+    const entries = WeightLog.entries();
+    const existing = entries.findIndex(e => e.date === date);
+    if (existing >= 0) entries[existing].weight_kg = weight_kg;
+    else entries.push({ date, weight_kg });
+    entries.sort((a, b) => a.date.localeCompare(b.date));
+    Store.set('weight_log', entries);
+    WeightLog.render();
+    API.post('/weight', { date, weight_kg }).catch(() => {});
+    showToast(`✓ Weight logged: ${weight_kg} kg`);
+  },
+  latest() { const e = WeightLog.entries(); return e.length ? e[e.length - 1] : null; },
+  render() {
+    const latest = WeightLog.latest();
+    const el = document.getElementById('weight-display');
+    if (el && latest) el.textContent = latest.weight_kg + ' kg';
+    WeightLog.renderChart();
+  },
+  renderChart() {
+    const canvas = document.getElementById('weight-chart');
+    if (!canvas) return;
+    const entries = WeightLog.entries().slice(-30);
+    if (entries.length < 2) { canvas.style.display = 'none'; return; }
+    canvas.style.display = 'block';
+    const ctx = canvas.getContext('2d');
+    const W = canvas.offsetWidth || 300, H = 80;
+    canvas.width = W; canvas.height = H;
+    const vals = entries.map(e => e.weight_kg);
+    const min = Math.min(...vals) - 1, max = Math.max(...vals) + 1;
+    const x = i => (i / (entries.length - 1)) * (W - 20) + 10;
+    const y = v => H - ((v - min) / (max - min)) * (H - 16) - 8;
+    ctx.clearRect(0, 0, W, H);
+    ctx.beginPath();
+    ctx.strokeStyle = '#C9A84C'; ctx.lineWidth = 2;
+    entries.forEach((e, i) => i === 0 ? ctx.moveTo(x(i), y(e.weight_kg)) : ctx.lineTo(x(i), y(e.weight_kg)));
+    ctx.stroke();
+    // Last dot
+    const last = entries[entries.length - 1];
+    ctx.beginPath();
+    ctx.arc(x(entries.length - 1), y(last.weight_kg), 4, 0, Math.PI * 2);
+    ctx.fillStyle = '#C9A84C'; ctx.fill();
+  },
+  openLogModal() {
+    const kg = prompt('Enter your weight in kg (e.g. 72.5):');
+    if (!kg || isNaN(parseFloat(kg))) return;
+    WeightLog.add(parseFloat(kg), Store.today());
+  }
+};
+
+/* ═══════════════════════
+   AI CHAT UPGRADE
+   ═══════════════════════ */
+// Extend existing sendAiMsg with context-aware responses
+const _origSendAiMsg = sendAiMsg;
+window.sendAiMsg = function() {
+  const inp = document.getElementById('ai-input');
+  const text = inp.value.trim();
+  if (!text) return;
+  inp.value = '';
+  addMessage(text, true);
+
+  const lower = text.toLowerCase();
+  const bloodEntries = BloodLog.entries();
+  const low = bloodEntries.filter(m => m.status === 'low' || m.status === 'critical');
+  const totals = FoodLog.totals();
+  const goals = FoodLog.goals();
+  const kcalLeft = goals.goal_kcal - totals.kcal;
+
+  let response = null;
+
+  // Context-aware responses using real user data
+  if (/food|eat|cal|calorie|macro|diet|nutrition/.test(lower)) {
+    if (totals.kcal > 0) response = `Today you've logged ${totals.kcal} kcal — ${kcalLeft > 0 ? `${kcalLeft} left to hit your ${goals.goal_kcal} goal` : "you've hit your calorie target!"}. Protein: ${Math.round(totals.protein_g)}g / ${goals.goal_protein}g, Carbs: ${Math.round(totals.carbs_g)}g, Fat: ${Math.round(totals.fat_g)}g.`;
+    else response = `Nothing logged today yet. Tap the food tab to log meals with the AI camera. Your goal is ${goals.goal_kcal} kcal with ${goals.goal_protein}g protein.`;
+  } else if (/blood|test|report|marker|vitamin|folate|b12|ferritin|iron|magnesium/.test(lower)) {
+    if (low.length) {
+      const lowNames = low.map(m => `${m.marker} (${m.value} ${m.unit})`).join(', ');
+      response = `Your blood panel shows ${low.length} low marker${low.length > 1 ? 's' : ''}: ${lowNames}. I'd prioritize ${low[0].marker} first — it has the biggest impact on your energy. Want a targeted supplement and food plan?`;
+    } else if (bloodEntries.length) {
+      response = `Your ${bloodEntries.length} tracked marker${bloodEntries.length > 1 ? 's' : ''} all look healthy! Keep up the supplement routine. I recommend retesting every 3–6 months.`;
+    }
+  } else if (/weight|kg|lb|loss/.test(lower)) {
+    const latest = WeightLog.latest();
+    if (latest) response = `Your latest logged weight is ${latest.weight_kg} kg (${latest.date}). Log your weight regularly in the Blood tab to see trends. Consistent protein intake and calorie tracking are key.`;
+    else response = "No weight logged yet. Tap the + in the Blood tab to log your weight. Tracking weekly helps spot trends that drive better decisions.";
+  }
+
+  if (!response) {
+    // Fall back to original keyword matching
+    for (const [key, val] of Object.entries(aiResponses)) {
+      if (lower.includes(key.split(' ')[0]) || lower.includes((key.split(' ')[1] || ''))) {
+        response = val; break;
+      }
+    }
+  }
+
+  if (!response) {
+    if (low.length) response = `Based on your profile, your ${low.map(m=>m.marker).join(' and ')} ${low.length > 1 ? 'levels are' : 'level is'} the main priority. These affect energy, immunity, and mood. Want specific food and supplement recommendations?`;
+    else response = `I've analyzed your data. ${totals.kcal > 0 ? `You've had ${totals.kcal} kcal today. ` : ''}What specific aspect of your health would you like to explore?`;
+  }
+
+  addMessage(response, false, 200);
+
+  // Optionally sync to backend
+  API.post('/chat', { message: text }).catch(() => {});
+};
+
+/* ═══════════════════════
+   GLOBAL TOAST
+   ═══════════════════════ */
+function showToast(msg) {
+  let toast = document.getElementById('global-toast');
+  if (!toast) {
+    toast = document.createElement('div');
+    toast.id = 'global-toast';
+    toast.style.cssText = 'position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(20px);background:#111;color:#fff;border-radius:999px;padding:10px 18px;font-size:12px;font-weight:700;opacity:0;transition:opacity 0.3s,transform 0.3s;z-index:1200;white-space:nowrap;pointer-events:none';
+    document.body.appendChild(toast);
+  }
+  toast.textContent = msg;
+  toast.style.opacity = '1'; toast.style.transform = 'translateX(-50%) translateY(0)';
+  clearTimeout(toast._t);
+  toast._t = setTimeout(() => { toast.style.opacity = '0'; toast.style.transform = 'translateX(-50%) translateY(20px)'; }, 2800);
+}
+
+/* ── Wire blood tab on first visit ── */
+const _origSwitchTab = switchAppTab;
+window.switchAppTab = function(tab) {
+  _origSwitchTab(tab);
+  if (tab === 'blood') setupBloodTab();
+};
+
+/* ── Override pmlConfirm to also use FoodLog.add ── */
+const _origPmlConfirm = pmlConfirm;
+window.pmlConfirm = function() {
+  if (pmlSelected) {
+    const s = pmlPortion;
+    const modal = document.getElementById('photo-modal');
+    const mealEl = document.querySelector('.meal-label.active-meal');
+    FoodLog.add({
+      meal: 'dinner', food_name: pmlSelected.name, emoji: pmlSelected.emoji,
+      kcal: pmlSelected.kcal[s], protein_g: pmlSelected.p[s], carbs_g: pmlSelected.c[s], fat_g: pmlSelected.f[s], portion: s,
+    });
+  }
+  _origPmlConfirm();
+};
+
+/* ── Setup blood tab on first open ── */
+setupBloodTab();
+</script>
 
 <script>
 if ('serviceWorker' in navigator) {
