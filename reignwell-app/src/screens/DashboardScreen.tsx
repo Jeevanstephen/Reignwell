@@ -1,9 +1,11 @@
-import React from 'react';
+import React, { useState, useCallback } from 'react';
 import { View, Text, ScrollView, StyleSheet, TouchableOpacity } from 'react-native';
 import { useNavigation } from '@react-navigation/native';
 import { BottomTabNavigationProp } from '@react-navigation/bottom-tabs';
 import { useAuth } from '../context/AuthContext';
 import ScoreRing from '../components/ScoreRing';
+import WaterRing from '../components/WaterRing';
+import { addWater, undoWater, getWaterToday, GOAL_ML } from '../lib/waterTracker';
 import { MainTabParamList } from '../navigation/MainNavigator';
 
 const NUTRIENTS = [
@@ -39,6 +41,17 @@ export default function DashboardScreen() {
   const { user, signOut } = useAuth();
   const navigation = useNavigation<BottomTabNavigationProp<MainTabParamList>>();
   const name = (user as any)?.user_metadata?.full_name?.split(' ')[0] ?? 'there';
+  const [waterMl, setWaterMl] = useState(getWaterToday());
+
+  const handleAddWater = useCallback((ml: number) => {
+    addWater(ml);
+    setWaterMl(getWaterToday());
+  }, []);
+
+  const handleUndoWater = useCallback(() => {
+    undoWater();
+    setWaterMl(getWaterToday());
+  }, []);
 
   return (
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
@@ -88,6 +101,26 @@ export default function DashboardScreen() {
             <Text style={styles.nutrientName}>{n.name}</Text>
           </View>
         ))}
+      </View>
+
+      {/* Water Tracker */}
+      <View style={styles.waterCard}>
+        <Text style={styles.cardLabel}>HYDRATION</Text>
+        <View style={styles.waterRow}>
+          <WaterRing ml={waterMl} goalMl={GOAL_ML} />
+          <View style={styles.waterControls}>
+            <Text style={styles.waterHint}>Quick add</Text>
+            <TouchableOpacity style={styles.waterPill} onPress={() => handleAddWater(250)}>
+              <Text style={styles.waterPillText}>+ 250 ml</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.waterPill} onPress={() => handleAddWater(500)}>
+              <Text style={styles.waterPillText}>+ 500 ml</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.undoBtn} onPress={handleUndoWater}>
+              <Text style={styles.undoBtnText}>− Undo</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </View>
 
       {/* Priority Action */}
@@ -146,6 +179,30 @@ const styles = StyleSheet.create({
   statusDot: { width: 8, height: 8, borderRadius: 4, marginBottom: 8 },
   nutrientValue: { fontSize: 18, fontWeight: '700', color: '#111111' },
   nutrientName: { fontSize: 11, color: '#666666', marginTop: 2, textAlign: 'center' },
+  waterCard: {
+    backgroundColor: '#F7F7F7',
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+  },
+  waterRow: { flexDirection: 'row', alignItems: 'center', gap: 24 },
+  waterControls: { flex: 1, gap: 8 },
+  waterHint: { fontSize: 11, color: '#999999', fontWeight: '600', marginBottom: 2 },
+  waterPill: {
+    backgroundColor: '#EAF7FC',
+    borderRadius: 20,
+    paddingVertical: 9,
+    alignItems: 'center',
+  },
+  waterPillText: { fontSize: 14, fontWeight: '700', color: '#1a7fa0' },
+  undoBtn: {
+    borderWidth: 1,
+    borderColor: '#E0E0E0',
+    borderRadius: 20,
+    paddingVertical: 7,
+    alignItems: 'center',
+  },
+  undoBtnText: { fontSize: 13, color: '#999999', fontWeight: '500' },
   priorityCard: {
     borderWidth: 1.5,
     borderColor: '#C9A84C',
