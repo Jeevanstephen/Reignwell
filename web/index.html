@@ -100,9 +100,9 @@ body.app-open { overflow: hidden; }
 .lp-logo { font-family: 'Space Grotesk', sans-serif; font-size: 20px; font-weight: 800; display: flex; align-items: center; gap: 9px; }
 .logo-mark { height: 40px; display: flex; align-items: center; }
 .logo-mark svg { height: 40px; width: auto; color: #111111; }
-.logo-text { font-size: 20px; line-height: 1; display: flex; align-items: baseline; }
-.logo-reign { font-family: 'Cormorant Garamond', Georgia, serif; font-style: normal; font-weight: 700; color: #111111; }
-.logo-well  { font-family: 'Space Grotesk', sans-serif; font-weight: 800; letter-spacing: 0.04em; color: #111111; }
+.logo-text { line-height: 1; display: flex; align-items: baseline; gap: 1px; }
+.logo-reign { font-family: 'Cormorant Garamond', Georgia, serif; font-style: normal; font-weight: 700; font-size: 1.25em; color: var(--fg); }
+.logo-well  { font-family: 'Space Grotesk', sans-serif; font-weight: 300; letter-spacing: 0.06em; font-size: 1em; color: var(--fg); }
 .logo-tagline { font-size: 10px; font-weight: 500; letter-spacing: 0.12em; text-transform: uppercase; color: var(--fg3); margin-left: 2px; align-self: flex-end; margin-bottom: 2px; }
 .lp-nav-links { display: flex; gap: 24px; list-style: none; margin-left: auto; font-size: 14px; color: var(--fg2); font-weight: 500; }
 .lp-nav-links a:hover { color: var(--fg); }
@@ -248,8 +248,8 @@ body.app-open { overflow: hidden; }
 .lp-section .qa-title { color: #555555; }
 .lp-section .connect-card { background: #F6F2EC; border-color: rgba(0,0,0,0.08); }
 .lp-section .connect-name { color: #111111; }
-.lp-section .stat-num { color: #111111; }
-.lp-section .stat-label { color: #555555; }
+.lp-section:not(.alt-bg) .stat-num { color: #111111; }
+.lp-section:not(.alt-bg) .stat-label { color: #555555; }
 .lp-section .feature-card:not(.featured) { background: #F5F0E8; border-color: rgba(0,0,0,0.08); }
 .lp-section .feature-title { color: #111111; }
 .lp-section .feature-text { color: #555555; }
@@ -366,8 +366,6 @@ body.app-open { overflow: hidden; }
 .app-topbar { padding: 8px 20px 10px; display: flex; align-items: center; gap: 10px; flex-shrink: 0; }
 .app-topbar-logo { display: flex; align-items: center; gap: 6px; }
 .app-topbar-logo .logo-text { font-size: 16px; }
-.app-topbar-logo .logo-reign { color: var(--fg); }
-.app-topbar-logo .logo-well  { color: var(--fg); }
 .app-close-btn { margin-left: auto; width: 30px; height: 30px; border-radius: 50%; background: var(--border); display: flex; align-items: center; justify-content: center; font-size: 14px; color: var(--fg2); transition: background 0.15s; }
 .app-close-btn:hover { background: var(--fg2); color: var(--bg); }
 .app-scroll { flex: 1; overflow-y: auto; overflow-x: hidden; -webkit-overflow-scrolling: touch; }
@@ -1040,7 +1038,7 @@ body.app-open { overflow: hidden; }
         <span>🔋</span>
       </div>
       <div class="app-topbar">
-        <div class="app-topbar-logo"><svg width="18" height="14" viewBox="0 0 56 44" fill="none"><path d="M4 36 L8 14 L18 26 L28 4 L38 26 L48 14 L52 36 Z" fill="var(--fg)" stroke="none"/><rect x="4" y="36" width="48" height="6" rx="2" fill="var(--fg)"/></svg><span class="logo-text"><span class="logo-reign">Reign</span><span class="logo-well">WELL</span></span></div>
+        <div class="app-topbar-logo"><svg width="20" height="14" viewBox="52 0 396 272" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" style="display:block;color:var(--fg)"><path d="M52,268 C54,255 60,246 70,240 L72,18 Q95,120 125,138 Q148,88 172,66 Q192,120 207,145 L250,10 L293,145 Q308,120 328,66 Q352,88 375,138 Q405,120 428,18 L430,240 C440,246 446,255 448,268 Z M231,249 C231,235 240,225 250,225 C260,225 269,235 269,249 C269,263 260,273 250,273 C240,273 231,263 231,249 Z" fill="currentColor" fill-rule="evenodd"/></svg><span class="logo-text"><span class="logo-reign">Reign</span><span class="logo-well">WELL</span></span></div>
         <div style="margin-left:auto;font-size:11px;font-weight:600;background:color-mix(in srgb,var(--accent) 15%,transparent);color:var(--accent-dk);padding:4px 10px;border-radius:999px;">Demo</div>
         <button class="app-close-btn" onclick="closeApp()">✕</button>
       </div>
@@ -2035,13 +2033,13 @@ const FoodLog = {
   }
 };
 
-/* Wire up add-btn clicks with meal IDs */
-document.addEventListener('DOMContentLoaded', () => {
+/* ── Init: runs after all objects defined below ── */
+function rwInit() {
   FoodLog.render();
   Auth.updateUI();
   BloodLog.render();
   WeightLog.render();
-});
+}
 
 /* ═══════════════════════
    BLOOD MARKERS
@@ -2209,9 +2207,36 @@ const WeightLog = {
     ctx.fillStyle = '#C9A84C'; ctx.fill();
   },
   openLogModal() {
-    const kg = prompt('Enter your weight in kg (e.g. 72.5):');
-    if (!kg || isNaN(parseFloat(kg))) return;
-    WeightLog.add(parseFloat(kg), Store.today());
+    let modal = document.getElementById('weight-log-modal');
+    if (!modal) {
+      modal = document.createElement('div');
+      modal.id = 'weight-log-modal';
+      modal.style.cssText = 'position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:999;display:flex;align-items:center;justify-content:center;backdrop-filter:blur(8px)';
+      modal.innerHTML = `
+        <div style="background:var(--surface);border-radius:var(--r);padding:24px;width:min(300px,90vw);box-shadow:var(--shadow-lg)">
+          <div style="font-family:'Space Grotesk',sans-serif;font-size:18px;font-weight:800;margin-bottom:16px">Log Weight</div>
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:20px">
+            <input id="weight-input" type="number" step="0.1" min="20" max="500" placeholder="e.g. 72.5"
+              style="flex:1;padding:12px 14px;border-radius:var(--r-sm);border:1.5px solid var(--border);background:var(--bg);color:var(--fg);font-size:20px;font-family:'Space Grotesk',sans-serif;font-weight:700"
+              onkeydown="if(event.key==='Enter')WeightLog.confirmLog()">
+            <span style="font-size:16px;font-weight:700;color:var(--fg3)">kg</span>
+          </div>
+          <div style="display:flex;gap:8px">
+            <button onclick="WeightLog.confirmLog()" style="flex:1;padding:12px;border-radius:var(--r-sm);background:var(--accent);color:#111;font-weight:700;font-size:14px;font-family:inherit">Save</button>
+            <button onclick="document.getElementById('weight-log-modal').remove()" style="padding:12px 16px;border-radius:var(--r-sm);border:1.5px solid var(--border);font-size:14px;font-family:inherit;color:var(--fg3)">Cancel</button>
+          </div>
+        </div>`;
+      document.body.appendChild(modal);
+      modal.addEventListener('click', e => { if (e.target === modal) modal.remove(); });
+    }
+    modal.style.display = 'flex';
+    setTimeout(() => document.getElementById('weight-input')?.focus(), 100);
+  },
+  confirmLog() {
+    const kg = parseFloat(document.getElementById('weight-input')?.value);
+    if (isNaN(kg) || kg < 20 || kg > 500) { showToast('Enter a valid weight'); return; }
+    document.getElementById('weight-log-modal')?.remove();
+    WeightLog.add(kg, Store.today());
   }
 };
 
@@ -2312,8 +2337,12 @@ window.pmlConfirm = function() {
   _origPmlConfirm();
 };
 
-/* ── Setup blood tab on first open ── */
-setupBloodTab();
+/* ── Init everything after all objects are defined ── */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', rwInit);
+} else {
+  rwInit();
+}
 </script>
 
 <script>
