@@ -4,6 +4,7 @@ import {
   Modal, TextInput, FlatList, Alert,
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import AiCameraModal from '../components/AiCameraModal';
 
 const FOOD_DB = [
   { id: 'f1',  emoji: '🍗', name: 'Grilled Chicken Breast', kcal: 165, protein: 31, carbs: 0,  fat: 3  },
@@ -72,6 +73,7 @@ function MacroBar({ label, value, goal, color }: { label: string; value: number;
 export default function FoodLogScreen() {
   const [meals, setMeals] = useState<LoggedMeal[]>([]);
   const [modalVisible, setModalVisible] = useState(false);
+  const [cameraVisible, setCameraVisible] = useState(false);
   const [search, setSearch] = useState('');
   const glowAnim = useRef(new Animated.Value(0)).current;
 
@@ -126,6 +128,25 @@ export default function FoodLogScreen() {
     setSearch('');
   }, [meals]);
 
+  const logFromCamera = useCallback((items: { name: string; calories: number }[], totalCalories: number) => {
+    const now = new Date();
+    const time = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    const newMeals: LoggedMeal[] = items.map((item, i) => ({
+      id: `${Date.now()}_${i}`,
+      foodId: `ai_${Date.now()}_${i}`,
+      emoji: '🤖',
+      name: item.name,
+      kcal: item.calories,
+      protein: 0,
+      carbs: 0,
+      fat: 0,
+      time,
+    }));
+    const updated = [...meals, ...newMeals];
+    setMeals(updated);
+    saveMeals(updated);
+  }, [meals]);
+
   const removeFood = useCallback((id: string) => {
     Alert.alert('Remove?', 'Remove this item from today\'s log?', [
       { text: 'Cancel', style: 'cancel' },
@@ -165,10 +186,10 @@ export default function FoodLogScreen() {
 
       {/* AI Camera Button */}
       <Animated.View style={[styles.cameraBtn, { opacity: glowOpacity }]}>
-        <TouchableOpacity style={styles.cameraBtnInner} onPress={() => setModalVisible(true)}>
+        <TouchableOpacity style={styles.cameraBtnInner} onPress={() => setCameraVisible(true)}>
           <Text style={styles.cameraIcon}>📸</Text>
-          <Text style={styles.cameraBtnText}>Log with AI Camera</Text>
-          <Text style={styles.cameraBtnSub}>Search or snap a photo to log nutrients</Text>
+          <Text style={styles.cameraBtnText}>Scan Food with AI</Text>
+          <Text style={styles.cameraBtnSub}>Snap a photo to auto-log nutrients</Text>
         </TouchableOpacity>
       </Animated.View>
 
@@ -192,6 +213,13 @@ export default function FoodLogScreen() {
       <TouchableOpacity style={styles.addBtn} onPress={() => setModalVisible(true)}>
         <Text style={styles.addBtnText}>+ Add manually</Text>
       </TouchableOpacity>
+
+      {/* AI Camera Modal */}
+      <AiCameraModal
+        visible={cameraVisible}
+        onClose={() => setCameraVisible(false)}
+        onLog={logFromCamera}
+      />
 
       {/* Food Search Modal */}
       <Modal visible={modalVisible} animationType="slide" presentationStyle="pageSheet">
