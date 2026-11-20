@@ -24,6 +24,7 @@ interface ActionItem {
 
 export default function QuickActionPanel({ onNavigate }: Props) {
   const [open, setOpen] = useState(false);
+  const [voiceModalOpen, setVoiceModalOpen] = useState(false);
   const slideAnim = useRef(new Animated.Value(300)).current;
   const overlayAnim = useRef(new Animated.Value(0)).current;
   const rotateAnim = useRef(new Animated.Value(0)).current;
@@ -57,7 +58,7 @@ export default function QuickActionPanel({ onNavigate }: Props) {
       { icon: '📷', label: 'Scan',          onPress: () => onNavigate('FoodLog') },
     ],
     [
-      { icon: '🎙️', label: 'Voice Log', onPress: () => comingSoon('Voice Log') },
+      { icon: '🎙️', label: 'Voice Log', onPress: () => { hide(); setTimeout(() => setVoiceModalOpen(true), 240); } },
       { icon: '🍽️', label: 'Custom Add', onPress: () => onNavigate('FoodLog') },
       { icon: '💧', label: 'Water',      onPress: () => onNavigate('Dashboard') },
     ],
@@ -67,7 +68,7 @@ export default function QuickActionPanel({ onNavigate }: Props) {
     { icon: '🏋️', label: 'Workout',   onPress: () => onNavigate('GymTracker') },
     { icon: '🍴', label: 'Meal Ideas', onPress: () => onNavigate('MealSuggestions') },
     { icon: '💊', label: 'Regimens',  onPress: () => onNavigate('Regimens') },
-    { icon: '📖', label: 'Journal',   onPress: () => comingSoon('Journal') },
+    { icon: '📖', label: 'Journal',   onPress: () => onNavigate('Journal') },
   ];
 
   const spin = rotateAnim.interpolate({ inputRange: [0, 1], outputRange: ['0deg', '45deg'] });
@@ -130,6 +131,24 @@ export default function QuickActionPanel({ onNavigate }: Props) {
 
           <View style={styles.safeBottom} />
         </Animated.View>
+      </Modal>
+
+      {/* Voice Log coming-soon bottom sheet */}
+      <Modal visible={voiceModalOpen} transparent animationType="slide">
+        <View style={voice.overlay}>
+          <Pressable style={StyleSheet.absoluteFill} onPress={() => setVoiceModalOpen(false)} />
+          <View style={voice.sheet}>
+            <View style={styles.handle} />
+            <Text style={voice.icon}>🎙️</Text>
+            <Text style={voice.title}>Voice Logging — Coming Soon</Text>
+            <Text style={voice.desc}>
+              We're building voice food logging. For now, use Describe Food or Quick Add.
+            </Text>
+            <TouchableOpacity style={voice.closeBtn} onPress={() => setVoiceModalOpen(false)}>
+              <Text style={voice.closeBtnText}>Close</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
       </Modal>
     </>
   );
@@ -195,4 +214,23 @@ const styles = StyleSheet.create({
   actionEmoji: { fontSize: 22 },
   actionLabel: { fontSize: 11, color: '#333333', fontWeight: '600', textAlign: 'center' },
   safeBottom: { height: 20 },
+});
+
+const voice = StyleSheet.create({
+  overlay: {
+    flex: 1, backgroundColor: 'rgba(0,0,0,0.3)',
+    justifyContent: 'flex-end',
+  },
+  sheet: {
+    backgroundColor: '#FFFFFF', borderTopLeftRadius: 24, borderTopRightRadius: 24,
+    padding: 24, paddingTop: 12, alignItems: 'center',
+  },
+  icon: { fontSize: 56, marginVertical: 16 },
+  title: { fontSize: 20, fontWeight: '700', color: '#111111', textAlign: 'center', marginBottom: 12 },
+  desc: { fontSize: 14, color: '#666666', lineHeight: 22, textAlign: 'center', marginBottom: 24 },
+  closeBtn: {
+    backgroundColor: '#C9A84C', borderRadius: 12,
+    paddingVertical: 14, paddingHorizontal: 48,
+  },
+  closeBtnText: { fontSize: 15, fontWeight: '700', color: '#111111' },
 });

@@ -12,6 +12,7 @@ import GymTrackerScreen from '../screens/GymTrackerScreen';
 import RegimensScreen from '../screens/RegimensScreen';
 import BloodMarkersScreen from '../screens/BloodMarkersScreen';
 import MealSuggestionsScreen from '../screens/MealSuggestionsScreen';
+import JournalScreen from '../screens/JournalScreen';
 import QuickActionPanel from '../components/QuickActionPanel';
 
 export type MainTabParamList = {
@@ -27,6 +28,7 @@ export type RootStackParamList = {
   Regimens: undefined;
   BloodMarkers: undefined;
   MealSuggestions: undefined;
+  Journal: undefined;
 };
 
 const Tab = createBottomTabNavigator<MainTabParamList>();
@@ -40,7 +42,7 @@ function TabsWithPanel() {
   const navigation = useNavigation<any>();
 
   const handleNavigate = (screen: string) => {
-    const stackScreens = ['GymTracker', 'Regimens', 'BloodMarkers', 'MealSuggestions'];
+    const stackScreens = ['GymTracker', 'Regimens', 'BloodMarkers', 'MealSuggestions', 'Journal'];
     if (stackScreens.includes(screen)) {
       navigation.navigate(screen);
     } else {
@@ -100,6 +102,7 @@ export default function MainNavigator() {
       <Stack.Screen name="Regimens" component={RegimensScreen} />
       <Stack.Screen name="BloodMarkers" component={BloodMarkersScreen} />
       <Stack.Screen name="MealSuggestions" component={MealSuggestionsScreen} />
+      <Stack.Screen name="Journal" component={JournalScreen} />
     </Stack.Navigator>
   );
 }
